@@ -91,6 +91,14 @@ public class Wrapper {
         public Wrapper.Result<List<Book>> getBooksBySerieId(int sid) {
             return Wrapper.getBooksBySerieId(this.ptr, sid);
         }
+
+        public Wrapper.Result<Pair<List<String>>> getAuthorsByPrefix(String prefix) {
+            return Wrapper.getAuthorsByPrefix(this.ptr, prefix);
+        }
+
+        public Wrapper.Result<Pair<List<String>>> getSeriesByPrefix(String prefix) {
+            return Wrapper.getSeriesByPrefix(this.ptr, prefix);
+        }
     }
 
     public static native long createOpdsApi(String dbPath);
@@ -101,6 +109,8 @@ public class Wrapper {
 
     public static native Result<List<String>> getAuthorsNextCharByPrefix(long api, String prefix);
 
+    public static native Result<Pair<List<String>>> getAuthorsByPrefix(long api, String prefix);
+
     public static native Result<List<Author>> getAuthorsByLastName(long api, String name);
 
     public static native Result<List<Author>> getAuthorsByGenreId(long api, int id);
@@ -110,6 +120,8 @@ public class Wrapper {
     public static native Result<Author> getAuthorByIds(long api, int fid, int mid, int lid);
 
     public static native Result<List<String>> getSeriesNextCharByPrefix(long api, String prefix);
+
+    public static native Result<Pair<List<String>>> getSeriesByPrefix(long api, String prefix);
 
     public static native Result<List<Serie>> getSeriesBySerieName(long api, String name);
 

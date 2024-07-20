@@ -35,63 +35,25 @@
             android:textSize="16sp" />
     </LinearLayout>
 
+    <EditText
+        android:id="@+id/searchEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:hint="@string/search" />
+
     <ListView
-        android:id="@+id/listView"
+        android:id="@+id/exactListView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
-</LinearLayout>
-<!--
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".SearchByPattern"
-    android:id="@+id/search_by_pattern">
-
-    <Button
-        android:id="@+id/home"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
         android:layout_margin="6dp"
-        android:text="@string/home"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/back"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:text="@string/back"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintRight_toRightOf="@id/home" />
-
-
-    <TextView
-        android:id="@+id/selectedItemTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:text="@string/selected"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintRight_toRightOf="@id/back"
-        />
+        android:layout_weight="0.1"
+        android:visibility="gone"/>
 
     <ListView
-        android:id="@+id/listView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:id="@+id/nvcListView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_margin="6dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/selectedItemTextView" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
--->
+        android:layout_weight="1"/>
+</LinearLayout>

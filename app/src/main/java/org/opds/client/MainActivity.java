@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 
-import org.opds.api.jni.Wrapper;
 import org.opds.utils.FileUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,13 +15,12 @@ import android.view.View;
 
 
 public class MainActivity extends AppCompatActivity {
-    private org.opds.client.databinding.ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        org.opds.client.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         String dbPath = FileUtils.copyAssetToInternalStorage(this, "books.db");
@@ -48,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openSearchByPatternActivity(String target) {
-        Intent intent = new Intent(this, SearchByPattern.class);
+        Intent intent = new Intent(this, SearchByPatternActivity.class);
         intent.putExtra("target", target);
         startActivity(intent);
     }
