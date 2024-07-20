@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">OpdsClient</string>
+    <string name="search_by_author">Поиск по авторам</string>
+    <string name="search_by_series">Поиск по сериям</string>
+    <string name="search_by_genres">Поиск по жанрам</string>
+    <string name="search_by_titles">Поиск по наименованиям</string>
+    <string name="database">База Данных</string>
+    <string name="selected">Selected:</string>
+    <string name="home">Домой</string>
+    <string name="back">Назад</string>
 </resources>
