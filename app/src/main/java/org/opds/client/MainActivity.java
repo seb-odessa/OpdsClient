@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private void openSearchByPatternActivity(String target) {
         Intent intent = new Intent(this, SearchByPatternActivity.class);
         intent.putExtra("target", target);
+        intent.putExtra("prefix", "");
         startActivity(intent);
     }
 }

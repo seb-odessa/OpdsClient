@@ -6,34 +6,7 @@
     android:padding="6dp"
     android:id="@+id/search_by_pattern">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
-
-        <Button
-            android:id="@+id/buttonHome"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/home" />
-
-        <Button
-            android:id="@+id/buttonBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/back"
-            android:layout_marginStart="6dp"
-            android:layout_marginEnd="6dp" />
-
-        <TextView
-            android:id="@+id/selectedItemTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/selected"
-            android:padding="6dp"
-            android:textSize="16sp" />
-    </LinearLayout>
+    <include layout="@layout/navigation" />
 
     <EditText
         android:id="@+id/searchEditText"

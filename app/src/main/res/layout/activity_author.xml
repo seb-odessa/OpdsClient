@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/search_by_pattern"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="6dp">
+
+    <include layout="@layout/navigation" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/books_by_series"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/books_by_series" />
+
+        <Button
+            android:id="@+id/books_without_series"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/books_without_series" />
+
+        <Button
+            android:id="@+id/books_by_genres"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/books_by_genres" />
+
+        <Button
+            android:id="@+id/books_by_alphabet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/books_by_alphabet" />
+
+        <Button
+            android:id="@+id/books_by_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/books_by_date" />
+    </LinearLayout>
+</LinearLayout>

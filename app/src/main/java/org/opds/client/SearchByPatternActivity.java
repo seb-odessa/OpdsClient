@@ -1,5 +1,6 @@
 package org.opds.client;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -14,7 +15,11 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.opds.api.jni.Wrapper;
+import org.opds.api.models.Author;
 import org.opds.api.models.Pair;
+import org.opds.api.models.Serie;
+import org.opds.client.adapters.AuthorAdapter;
+import org.opds.client.adapters.SerieAdapter;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,8 +33,12 @@ public class SearchByPatternActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_by_pattern);
 
-        target = getInentExtraString("target");
-        final String prefix = getInentExtraString("prefix");
+        target = getIntent().getStringExtra("target");
+        assert target != null;
+
+        final String prefix = getIntent().getStringExtra("prefix");
+        assert prefix != null;
+
         loadItems(prefix);
 
         Button buttonHome = findViewById(R.id.buttonHome);
@@ -45,6 +54,7 @@ public class SearchByPatternActivity extends AppCompatActivity {
         });
 
         EditText searchEditText = findViewById(R.id.searchEditText);
+        searchEditText.setText(prefix);
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -81,11 +91,6 @@ public class SearchByPatternActivity extends AppCompatActivity {
         }
     }
 
-    private String getInentExtraString(String name) {
-        final String value = getIntent().getStringExtra(name);
-        return (value == null) ? "" : value;
-    }
-
     private Wrapper.Result<Pair<List<String>>> getSearchResult(String prefix) {
         AppContext app = (AppContext) getApplicationContext();
         if (target.equals("authors")) {
@@ -96,21 +101,61 @@ public class SearchByPatternActivity extends AppCompatActivity {
             return Wrapper.Result.error("Empty target. Must be `authors` or `series`");
         }
     }
+
+    private List<Author> loadMatchedAuthors(List<String> names) {
+        AppContext app = (AppContext) getApplicationContext();
+        return names.stream()
+                .map(name -> app.getApi().getAuthorsByLastName(name))
+                .filter(Wrapper.Result::isSuccess)
+                .map(Wrapper.Result::getValue)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+    }
+
+    private List<Serie> loadMatchedSeries(List<String> names) {
+        AppContext app = (AppContext) getApplicationContext();
+        return names.stream()
+                .map(name -> app.getApi().getSeriesBySerieName(name))
+                .filter(Wrapper.Result::isSuccess)
+                .map(Wrapper.Result::getValue)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+    }
+
+    private ArrayAdapter<?> getAdapter(Context context, List<String> items) {
+        if (target.equals("authors")) {
+            return new AuthorAdapter(context, loadMatchedAuthors(items));
+        } else if (target.equals("series")) {
+            return new SerieAdapter(context, loadMatchedSeries(items));
+        } else {
+            return new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
+        }
+    }
+
     private void loadFullMatched(ListView listView, List<String> strings) {
         List<String> items = strings.stream()
                 .filter(item -> item != null && !item.trim().isEmpty())
                 .collect(Collectors.toList());
 
         if (!items.isEmpty()) {
-            ArrayAdapter<String> exactAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
-            listView.setAdapter(exactAdapter);
+            ArrayAdapter<?> adapter = getAdapter(this, items);
+            listView.setAdapter(adapter);
             listView.setVisibility(View.VISIBLE);
             listView.setOnItemClickListener((parent, view, position, id) -> {
-                String selected = items.get(position);
-                Intent intent = new Intent(this, SearchByPatternActivity.class);
-                intent.putExtra("target", target);
-                intent.putExtra("prefix", selected);
-                startActivity(intent);
+                Object item = adapter.getItem(position);
+
+                if (item instanceof Author) {
+                    Author author = (Author) item;
+                    Intent intent = new Intent(this, AuthorActivity.class);
+                    intent.putExtra("author", author.toString());
+                    startActivity(intent);
+                }
+                if (item instanceof Serie) {
+                    Serie serie = (Serie) item;
+                    Intent intent = new Intent(this, AuthorActivity.class);
+                    intent.putExtra("serie", serie.toString());
+                    startActivity(intent);
+                }
             });
         } else {
             listView.setVisibility(View.GONE);

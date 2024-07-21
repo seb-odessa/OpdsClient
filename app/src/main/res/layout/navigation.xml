@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navigation"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="6dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <Button
+        android:id="@+id/buttonHome"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="4dp"
+        android:background="@null"
+        android:contentDescription="@string/home"
+        android:drawableTop="@drawable/ic_home" />
+
+    <Button
+        android:id="@+id/buttonBack"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="4dp"
+        android:background="@null"
+        android:drawableTop="@drawable/ic_back" />
+
+    <TextView
+        android:id="@+id/selectedItemTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:text="@string/selected"
+        android:textSize="16sp" />
+
+</LinearLayout>
