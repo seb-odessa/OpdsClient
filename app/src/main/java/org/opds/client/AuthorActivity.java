@@ -23,6 +23,60 @@ public class AuthorActivity extends AppCompatActivity {
         TextView authorFullName = findViewById(R.id.selectedItemTextView);
         authorFullName.setText(author);
 
+        final int fid = getIntent().getIntExtra("fid", 0);
+        final int mid = getIntent().getIntExtra("mid", 0);
+        final int lid = getIntent().getIntExtra("lid", 0);
+
+        Button buttonBooksBySeries = findViewById(R.id.books_by_series);
+        buttonBooksBySeries.setOnClickListener(v -> {
+            Intent intent = new Intent(this, BooksActivity.class);
+            intent.putExtra("author", author);
+            intent.putExtra("fid", fid);
+            intent.putExtra("mid", mid);
+            intent.putExtra("lid", lid);
+            startActivity(intent);
+        });
+        Button buttonBooksWoSeries = findViewById(R.id.books_without_series);
+        buttonBooksWoSeries.setOnClickListener(v -> {
+            Intent intent = new Intent(this, BooksActivity.class);
+            intent.putExtra("author", author);
+            intent.putExtra("queryType", "books_without_series");
+            intent.putExtra("fid", fid);
+            intent.putExtra("mid", mid);
+            intent.putExtra("lid", lid);
+            startActivity(intent);
+        });
+        Button buttonBooksByGenres = findViewById(R.id.books_by_genres);
+        buttonBooksByGenres.setOnClickListener(v -> {
+            Intent intent = new Intent(this, BooksActivity.class);
+            intent.putExtra("author", author);
+            intent.putExtra("queryType", "books_by_genres");
+            intent.putExtra("fid", fid);
+            intent.putExtra("mid", mid);
+            intent.putExtra("lid", lid);
+            startActivity(intent);
+        });
+        Button buttonBooksByAlpha = findViewById(R.id.books_by_alphabet);
+        buttonBooksByAlpha.setOnClickListener(v -> {
+            Intent intent = new Intent(this, BooksActivity.class);
+            intent.putExtra("author", author);
+            intent.putExtra("queryType", "books_by_alphabet");
+            intent.putExtra("fid", fid);
+            intent.putExtra("mid", mid);
+            intent.putExtra("lid", lid);
+            startActivity(intent);
+        });
+        Button buttonBooksByDate = findViewById(R.id.books_by_date);
+        buttonBooksByDate.setOnClickListener(v -> {
+            Intent intent = new Intent(this, BooksActivity.class);
+            intent.putExtra("author", author);
+            intent.putExtra("queryType", "books_by_date");
+            intent.putExtra("fid", fid);
+            intent.putExtra("mid", mid);
+            intent.putExtra("lid", lid);
+            startActivity(intent);
+        });
+
         Button buttonHome = findViewById(R.id.buttonHome);
         buttonHome.setOnClickListener(v -> {
             Intent intent = new Intent(this, MainActivity.class);
@@ -34,6 +88,5 @@ public class AuthorActivity extends AppCompatActivity {
         buttonBack.setOnClickListener(v -> {
             finish();
         });
-
     }
 }

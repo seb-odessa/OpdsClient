@@ -4,6 +4,8 @@ import java.util.Locale;
 import java.util.Objects;
 
 public class Book {
+    public static final double KB = 1024.0;
+    public static final double MB = 1024.0 * KB;
     public int id;
     public String name;
     public int sid;
@@ -22,6 +24,14 @@ public class Book {
         this.added = added;
     }
 
+    public String getTitle() {
+        return name;
+    }
+
+    public String getAdded() {
+        return added;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -33,9 +43,6 @@ public class Book {
 
         return sb.toString();
     }
-
-    public static final double KB = 1024.0;
-    public static final double MB = 1024.0 * KB;
 
     private String format(int size) {
         if (size >= MB) {

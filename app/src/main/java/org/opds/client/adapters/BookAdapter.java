@@ -9,26 +9,27 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import org.opds.api.models.Serie;
+import org.opds.api.models.Book;
 
 import java.util.List;
 
-public class SerieAdapter extends ArrayAdapter<Serie> {
+public class BookAdapter extends ArrayAdapter<Book> {
 
-    public SerieAdapter(Context context, List<Serie> series) {
+    public BookAdapter(Context context, List<Book> series) {
         super(context, 0, series);
     }
 
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        Serie item = getItem(position);
+        Book book = getItem(position);
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
         }
         TextView textView = convertView.findViewById(android.R.id.text1);
-        assert item != null;
-        textView.setText(item.toString());
+        assert book != null;
+        String msg = book.name + "(" + book.added + ")";
+        textView.setText(msg);
         return convertView;
     }
 }

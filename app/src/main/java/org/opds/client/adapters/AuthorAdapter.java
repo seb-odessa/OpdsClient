@@ -22,17 +22,13 @@ public class AuthorAdapter extends ArrayAdapter<Author> {
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        Author author = getItem(position);
-
+        Author item = getItem(position);
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
         }
-
         TextView textView = convertView.findViewById(android.R.id.text1);
-
-        assert author != null;
-        textView.setText(author.toString());
-
+        assert item != null;
+        textView.setText(item.toString());
         return convertView;
     }
 }

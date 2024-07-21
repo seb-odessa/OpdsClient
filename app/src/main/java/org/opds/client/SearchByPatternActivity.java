@@ -148,6 +148,9 @@ public class SearchByPatternActivity extends AppCompatActivity {
                     Author author = (Author) item;
                     Intent intent = new Intent(this, AuthorActivity.class);
                     intent.putExtra("author", author.toString());
+                    intent.putExtra("fid", author.first_name.id);
+                    intent.putExtra("mid", author.middle_name.id);
+                    intent.putExtra("lid", author.last_name.id);
                     startActivity(intent);
                 }
                 if (item instanceof Serie) {
