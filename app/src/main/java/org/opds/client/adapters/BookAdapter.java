@@ -28,8 +28,8 @@ public class BookAdapter extends ArrayAdapter<Book> {
         }
         TextView textView = convertView.findViewById(android.R.id.text1);
         assert book != null;
-        String msg = book.name + "(" + book.added + ")";
-        textView.setText(msg);
+        final String title = book.name + "(" + book.added + ")";
+        textView.setText((0 == book.idx) ? title : book.idx + " " + title);
         return convertView;
     }
 }

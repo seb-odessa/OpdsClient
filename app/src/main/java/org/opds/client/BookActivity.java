@@ -16,7 +16,13 @@ import org.opds.client.adapters.BookAdapter;
 import java.util.Comparator;
 import java.util.List;
 
-public class BooksActivity extends AppCompatActivity {
+public class BookActivity extends AppCompatActivity {
+
+    public enum Sort {
+        BY_TITLE,
+        BY_DATE,
+        BY_SERIE
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,19 +41,25 @@ public class BooksActivity extends AppCompatActivity {
         assert queryType != null;
         AppContext app = (AppContext) getApplicationContext();
         switch (queryType) {
+            case "books_by_author_and_serie": {
+                final int sid = getIntent().getIntExtra("sid", 0);
+                Wrapper.Result<List<Book>> result = app.getApi().getBooksByAuthorIdsAndSerieId(fid, mid, lid, sid);
+                loadBooks(result, Sort.BY_SERIE);
+                break;
+            }
             case "books_without_series": {
                 Wrapper.Result<List<Book>> result = app.getApi().getBooksByAuthorIdsWithoutSerie(fid, mid, lid);
-                loadBooks(result, false);
+                loadBooks(result, Sort.BY_TITLE);
                 break;
             }
             case "books_by_alphabet": {
                 Wrapper.Result<List<Book>> result = app.getApi().getBooksByAuthorIds(fid, mid, lid);
-                loadBooks(result, false);
+                loadBooks(result, Sort.BY_TITLE);
                 break;
             }
             case "books_by_date": {
                 Wrapper.Result<List<Book>> result = app.getApi().getBooksByAuthorIds(fid, mid, lid);
-                loadBooks(result, true);
+                loadBooks(result, Sort.BY_DATE);
                 break;
             }
         }
@@ -65,12 +77,18 @@ public class BooksActivity extends AppCompatActivity {
         });
     }
 
-    private void loadBooks(Wrapper.Result<List<Book>> result, boolean sortByDate) {
+    private void loadBooks(Wrapper.Result<List<Book>> result, Sort sort) {
         if (result.isSuccess()) {
             List<Book> books = result.getValue();
-            if (sortByDate) {
-                books.sort(Comparator.comparing(Book::getAdded));
+            switch (sort) {
+                case BY_DATE:
+                    books.sort(Comparator.comparing(Book::getAdded).reversed());
+                    break;
+                case BY_SERIE:
+                    books.sort(Comparator.comparingInt(Book::getSerieIndex));
+                    break;
             }
+
             BookAdapter adapter = new BookAdapter(this, books);
             ListView listView = findViewById(R.id.booksView);
             listView.setAdapter(adapter);

@@ -32,6 +32,11 @@ public class Book {
         return added;
     }
 
+    public int getSerieIndex() {
+        return idx;
+    }
+
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
