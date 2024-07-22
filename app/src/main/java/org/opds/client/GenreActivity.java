@@ -35,7 +35,8 @@ public class GenreActivity extends AppCompatActivity {
 
         Button buttonSeriesByGenre = findViewById(R.id.series_by_genre);
         buttonSeriesByGenre.setOnClickListener(v -> {
-            Intent intent = new Intent(this, AuthorListActivity.class);
+            Intent intent = new Intent(this, SerieListActivity.class);
+            intent.putExtra("queryType", "series_by_genre");
             intent.putExtra("gid", gid);
             intent.putExtra("genre", genre);
             startActivity(intent);
@@ -44,6 +45,7 @@ public class GenreActivity extends AppCompatActivity {
         Button buttonBooksByGenre = findViewById(R.id.books_by_genre);
         buttonBooksByGenre.setOnClickListener(v -> {
             Intent intent = new Intent(this, BookListActivity.class);
+            intent.putExtra("queryType", "books_by_genre");
             intent.putExtra("gid", gid);
             intent.putExtra("genre", genre);
             startActivity(intent);

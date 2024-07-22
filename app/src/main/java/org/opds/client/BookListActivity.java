@@ -1,7 +1,10 @@
 package org.opds.client;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -9,13 +12,20 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import org.opds.api.jni.Wrapper;
 import org.opds.api.models.Book;
+import org.opds.api.models.Serie;
 import org.opds.client.adapters.BookAdapter;
+import org.opds.client.adapters.SerieAdapter;
 import org.opds.utils.Navigation;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BookListActivity extends AppCompatActivity {
+    List<Book> items;
+    List<Book> filtered;
+    BookAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,45 +33,82 @@ public class BookListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_books);
         Navigation.create(this);
 
-        final String author = getIntent().getStringExtra("author");
-        assert author != null;
         TextView selectedItem = findViewById(R.id.selectedItemTextView);
-        selectedItem.setText(author);
+        final String author = getIntent().getStringExtra("author");
+        final String genre = getIntent().getStringExtra("genre");
+        if (author != null) {
+            selectedItem.setText(author);
+        } else if (genre != null) {
+            selectedItem.setText(genre);
+        }
 
         final int fid = getIntent().getIntExtra("fid", 0);
         final int mid = getIntent().getIntExtra("mid", 0);
         final int lid = getIntent().getIntExtra("lid", 0);
+        final int sid = getIntent().getIntExtra("sid", 0);
+        final int gid = getIntent().getIntExtra("gid", 0);
+
         final String queryType = getIntent().getStringExtra("queryType");
         assert queryType != null;
         AppContext app = (AppContext) getApplicationContext();
         switch (queryType) {
             case "books_by_author_and_serie": {
-                final int sid = getIntent().getIntExtra("sid", 0);
                 Wrapper.Result<List<Book>> result = app.getApi().getBooksByAuthorIdsAndSerieId(fid, mid, lid, sid);
-                loadBooks(result, Sort.BY_SERIE);
+                loadItems(result, Sort.BY_SERIE);
                 break;
             }
             case "books_without_series": {
                 Wrapper.Result<List<Book>> result = app.getApi().getBooksByAuthorIdsWithoutSerie(fid, mid, lid);
-                loadBooks(result, Sort.BY_TITLE);
+                loadItems(result, Sort.BY_TITLE);
                 break;
             }
             case "books_by_alphabet": {
                 Wrapper.Result<List<Book>> result = app.getApi().getBooksByAuthorIds(fid, mid, lid);
-                loadBooks(result, Sort.BY_TITLE);
+                loadItems(result, Sort.BY_TITLE);
                 break;
             }
             case "books_by_date": {
                 Wrapper.Result<List<Book>> result = app.getApi().getBooksByAuthorIds(fid, mid, lid);
-                loadBooks(result, Sort.BY_DATE);
+                loadItems(result, Sort.BY_DATE);
+                break;
+            }
+            case "books_by_genre": {
+                Wrapper.Result<List<Book>> result = app.getApi().getBooksByGenreIdAndDate(gid, "%");
+                loadItems(result, Sort.BY_TITLE);
                 break;
             }
         }
+
+        EditText searchEditText = findViewById(R.id.searchEditText);
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // No action needed
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String prefix = s.toString().toLowerCase();
+
+                filtered =
+                        items.stream().filter(item -> item.name.toLowerCase().startsWith(prefix))
+                                .collect(Collectors.toList());
+
+                adapter.clear();
+                adapter.addAll(filtered);
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // No action needed
+            }
+        });
     }
 
-    private void loadBooks(Wrapper.Result<List<Book>> result, Sort sort) {
+    private void loadItems(Wrapper.Result<List<Book>> result, Sort sort) {
         if (result.isSuccess()) {
-            List<Book> items = result.getValue();
+            items = result.getValue();
             switch (sort) {
                 case BY_DATE:
                     items.sort(Comparator.comparing(Book::getAdded).reversed());
@@ -70,8 +117,8 @@ public class BookListActivity extends AppCompatActivity {
                     items.sort(Comparator.comparingInt(Book::getSerieIndex));
                     break;
             }
-
-            BookAdapter adapter = new BookAdapter(this, items);
+            filtered = new ArrayList<>(items);
+            adapter = new BookAdapter(this, filtered);
             ListView listView = findViewById(R.id.itemsView);
             listView.setAdapter(adapter);
             listView.setVisibility(View.VISIBLE);

@@ -8,6 +8,15 @@
 
     <include layout="@layout/navigation" />
 
+    <EditText
+        android:id="@+id/searchEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:inputType="text"
+        android:maxLength="64"
+        android:hint="@string/search" />
+
     <ListView
         android:id="@+id/seriesView"
         android:layout_width="match_parent"

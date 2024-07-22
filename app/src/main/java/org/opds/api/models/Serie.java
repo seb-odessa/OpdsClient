@@ -1,5 +1,7 @@
 
 package org.opds.api.models;
+import androidx.annotation.NonNull;
+
 import java.util.Objects;
 
 public class Serie {
@@ -15,9 +17,10 @@ public class Serie {
         this.author = author;
     }
 
+    @NonNull
     @Override
     public String toString() {
-        return name + " [" + author + "] (" + count + ")";
+        return name + "\n [" + author + "] (" + count + ")";
     }
 
     // Метод equals()
