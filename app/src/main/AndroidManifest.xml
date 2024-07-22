@@ -14,16 +14,16 @@
         android:theme="@style/Theme.OpdsClient"
         tools:targetApi="31">
         <activity
-            android:name=".GenreActivity"
+            android:name=".GenreListActivity"
             android:exported="false" />
         <activity
-            android:name=".MetaActivity"
+            android:name=".MetaListActivity"
             android:exported="false" />
         <activity
-            android:name=".SerieActivity"
+            android:name=".SerieListActivity"
             android:exported="false" />
         <activity
-            android:name=".BookActivity"
+            android:name=".BookListActivity"
             android:exported="false" />
         <activity
             android:name=".AuthorActivity"

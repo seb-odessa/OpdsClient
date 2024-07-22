@@ -155,7 +155,7 @@ public class SearchByPatternActivity extends AppCompatActivity {
                 }
                 if (item instanceof Serie) {
                     Serie serie = (Serie) item;
-                    Intent intent = new Intent(this, BookActivity.class);
+                    Intent intent = new Intent(this, BookListActivity.class);
                     intent.putExtra("author", serie.author.toString());
                     intent.putExtra("queryType", "books_by_author_and_serie");
                     intent.putExtra("fid", serie.author.first_name.id);

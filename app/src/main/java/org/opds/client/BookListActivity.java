@@ -16,7 +16,7 @@ import org.opds.client.adapters.BookAdapter;
 import java.util.Comparator;
 import java.util.List;
 
-public class BookActivity extends AppCompatActivity {
+public class BookListActivity extends AppCompatActivity {
 
     public enum Sort {
         BY_TITLE,

@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         searchGenres.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Intent intent = new Intent(ctx, MetaActivity.class);
+                final Intent intent = new Intent(ctx, MetaListActivity.class);
                 startActivity(intent);
             }
         });

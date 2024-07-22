@@ -25,7 +25,7 @@ public class AuthorActivity extends AppCompatActivity {
 
         Button buttonBooksBySeries = findViewById(R.id.books_by_series);
         buttonBooksBySeries.setOnClickListener(v -> {
-            Intent intent = new Intent(this, SerieActivity.class);
+            Intent intent = new Intent(this, SerieListActivity.class);
             intent.putExtra("author", author);
             intent.putExtra("queryType", "series_by_author");
             intent.putExtra("fid", fid);
@@ -35,7 +35,7 @@ public class AuthorActivity extends AppCompatActivity {
         });
         Button buttonBooksWoSeries = findViewById(R.id.books_without_series);
         buttonBooksWoSeries.setOnClickListener(v -> {
-            Intent intent = new Intent(this, BookActivity.class);
+            Intent intent = new Intent(this, BookListActivity.class);
             intent.putExtra("author", author);
             intent.putExtra("queryType", "books_without_series");
             intent.putExtra("fid", fid);
@@ -45,7 +45,7 @@ public class AuthorActivity extends AppCompatActivity {
         });
         Button buttonBooksByGenres = findViewById(R.id.books_by_genres);
         buttonBooksByGenres.setOnClickListener(v -> {
-            Intent intent = new Intent(this, BookActivity.class);
+            Intent intent = new Intent(this, BookListActivity.class);
             intent.putExtra("author", author);
             intent.putExtra("queryType", "books_by_genres");
             intent.putExtra("fid", fid);
@@ -55,7 +55,7 @@ public class AuthorActivity extends AppCompatActivity {
         });
         Button buttonBooksByAlpha = findViewById(R.id.books_by_alphabet);
         buttonBooksByAlpha.setOnClickListener(v -> {
-            Intent intent = new Intent(this, BookActivity.class);
+            Intent intent = new Intent(this, BookListActivity.class);
             intent.putExtra("author", author);
             intent.putExtra("queryType", "books_by_alphabet");
             intent.putExtra("fid", fid);
@@ -65,7 +65,7 @@ public class AuthorActivity extends AppCompatActivity {
         });
         Button buttonBooksByDate = findViewById(R.id.books_by_date);
         buttonBooksByDate.setOnClickListener(v -> {
-            Intent intent = new Intent(this, BookActivity.class);
+            Intent intent = new Intent(this, BookListActivity.class);
             intent.putExtra("author", author);
             intent.putExtra("queryType", "books_by_date");
             intent.putExtra("fid", fid);

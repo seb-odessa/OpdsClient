@@ -3,35 +3,30 @@ package org.opds.client;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import org.opds.api.jni.Wrapper;
-import org.opds.api.models.Book;
 import org.opds.api.models.Value;
-import org.opds.client.adapters.BookAdapter;
 import org.opds.client.adapters.ValueAdapter;
 
-import java.util.Comparator;
 import java.util.List;
 
-public class MetaActivity extends AppCompatActivity {
+public class GenreListActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_meta);
+        setContentView(R.layout.activity_genres);
+
+        final String meta = getIntent().getStringExtra("meta");
+        assert meta != null;
 
         AppContext app = (AppContext) getApplicationContext();
-        Wrapper.Result<List<String>> result = app.getApi().getMetaGenres();
+        Wrapper.Result<List<Value>> result = app.getApi().getGenresByMeta(meta);
         loadItems(result);
 
         Button buttonHome = findViewById(R.id.buttonHome);
@@ -45,22 +40,23 @@ public class MetaActivity extends AppCompatActivity {
         buttonBack.setOnClickListener(v -> {
             finish();
         });
+
     }
-    private void loadItems(Wrapper.Result<List<String>> result) {
+    private void loadItems(Wrapper.Result<List<Value>> result) {
         if (result.isSuccess()) {
-            List<String> items = result.getValue();
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
+            List<Value> items = result.getValue();
+            ValueAdapter adapter = new ValueAdapter(this,  items);
             ListView listView = findViewById(R.id.itemsView);
             listView.setAdapter(adapter);
             listView.setVisibility(View.VISIBLE);
             listView.setOnItemClickListener((parent, view, position, id) -> {
-                String item = adapter.getItem(position);
+                Value item = adapter.getItem(position);
                 assert item != null;
                 TextView selectedItem = findViewById(R.id.selectedItemTextView);
-                selectedItem.setText(item);
-                Intent intent = new Intent(this, GenreActivity.class);
-                intent.putExtra("meta", item);
-                startActivity(intent);
+                selectedItem.setText(item.toString());
+//                Intent intent = new Intent(this, GenreActivity.class);
+//                intent.putExtra("meta", item);
+//                startActivity(intent);
             });
         } else {
             TextView selectedItem = findViewById(R.id.selectedItemTextView);

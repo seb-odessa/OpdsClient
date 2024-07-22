@@ -16,12 +16,12 @@ import org.opds.client.adapters.SerieAdapter;
 
 import java.util.List;
 
-public class SerieActivity extends AppCompatActivity {
+public class SerieListActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_serie);
+        setContentView(R.layout.activity_series);
         final String author = getIntent().getStringExtra("author");
         if (author != null) {
             TextView selectedItem = findViewById(R.id.selectedItemTextView);
@@ -67,7 +67,7 @@ public class SerieActivity extends AppCompatActivity {
                 assert serie != null;
                 TextView selectedItem = findViewById(R.id.selectedItemTextView);
                 selectedItem.setText(serie.toString());
-                Intent intent = new Intent(this, BookActivity.class);
+                Intent intent = new Intent(this, BookListActivity.class);
                 Author author = serie.author;
                 intent.putExtra("author", author.toString());
                 intent.putExtra("queryType", "books_by_author_and_serie");

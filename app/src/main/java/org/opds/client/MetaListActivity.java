@@ -8,30 +8,21 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import org.opds.api.jni.Wrapper;
-import org.opds.api.models.Value;
-import org.opds.client.adapters.ValueAdapter;
 
 import java.util.List;
 
-public class GenreActivity extends AppCompatActivity {
+public class MetaListActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_genre);
-
-        final String meta = getIntent().getStringExtra("meta");
-        assert meta != null;
+        setContentView(R.layout.activity_meta);
 
         AppContext app = (AppContext) getApplicationContext();
-        Wrapper.Result<List<Value>> result = app.getApi().getGenresByMeta(meta);
+        Wrapper.Result<List<String>> result = app.getApi().getMetaGenres();
         loadItems(result);
 
         Button buttonHome = findViewById(R.id.buttonHome);
@@ -45,23 +36,22 @@ public class GenreActivity extends AppCompatActivity {
         buttonBack.setOnClickListener(v -> {
             finish();
         });
-
     }
-    private void loadItems(Wrapper.Result<List<Value>> result) {
+    private void loadItems(Wrapper.Result<List<String>> result) {
         if (result.isSuccess()) {
-            List<Value> items = result.getValue();
-            ValueAdapter adapter = new ValueAdapter(this,  items);
+            List<String> items = result.getValue();
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
             ListView listView = findViewById(R.id.itemsView);
             listView.setAdapter(adapter);
             listView.setVisibility(View.VISIBLE);
             listView.setOnItemClickListener((parent, view, position, id) -> {
-                Value item = adapter.getItem(position);
+                String item = adapter.getItem(position);
                 assert item != null;
                 TextView selectedItem = findViewById(R.id.selectedItemTextView);
-                selectedItem.setText(item.toString());
-//                Intent intent = new Intent(this, GenreActivity.class);
-//                intent.putExtra("meta", item);
-//                startActivity(intent);
+                selectedItem.setText(item);
+                Intent intent = new Intent(this, GenreListActivity.class);
+                intent.putExtra("meta", item);
+                startActivity(intent);
             });
         } else {
             TextView selectedItem = findViewById(R.id.selectedItemTextView);
