@@ -8,5 +8,27 @@
 
     <include layout="@layout/navigation" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
+        <Button
+            android:id="@+id/authors_by_genre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/authors_by_genre" />
+
+        <Button
+            android:id="@+id/series_by_genre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/series_by_genre" />
+
+        <Button
+            android:id="@+id/books_by_genre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/books_by_genre" />
+    </LinearLayout>
 </LinearLayout>

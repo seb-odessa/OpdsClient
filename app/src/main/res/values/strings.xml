@@ -16,4 +16,7 @@
     <string name="books_by_date">Книги по дате поступления</string>
     <string name="https_www_flaticon_com_free_icons_back_button">https://www.flaticon.com/free-icons/back-button</string>
     <string name="https_www_flaticon_com_free_icons_home_button">https://www.flaticon.com/free-icons/home-button</string>
+    <string name="authors_by_genre">Авторы по жанру</string>
+    <string name="series_by_genre">Серии по жанру</string>
+    <string name="books_by_genre">Книги по жанру</string>
 </resources>

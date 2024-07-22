@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/search_by_pattern"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="6dp"
-    android:id="@+id/search_by_pattern">
+    android:padding="6dp">
 
     <include layout="@layout/navigation" />
 
@@ -18,17 +18,10 @@
         android:hint="@string/search" />
 
     <ListView
-        android:id="@+id/exactListView"
+        android:id="@+id/itemsView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="6dp"
-        android:layout_weight="0.1"
-        android:visibility="gone"/>
+        android:layout_weight="1" />
 
-    <ListView
-        android:id="@+id/nvcListView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_margin="6dp"
-        android:layout_weight="1"/>
 </LinearLayout>
