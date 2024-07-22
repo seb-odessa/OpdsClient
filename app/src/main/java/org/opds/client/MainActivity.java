@@ -3,16 +3,13 @@ package org.opds.client;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
-
-import org.opds.utils.FileUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.opds.client.databinding.ActivityMainBinding;
-
-
-import android.view.View;
+import org.opds.utils.FileUtils;
 
 
 public class MainActivity extends AppCompatActivity {

@@ -7,7 +7,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -20,6 +19,7 @@ import org.opds.api.models.Pair;
 import org.opds.api.models.Serie;
 import org.opds.client.adapters.AuthorAdapter;
 import org.opds.client.adapters.SerieAdapter;
+import org.opds.utils.Navigation;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +32,7 @@ public class SearchByPatternActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_by_pattern);
+        Navigation.create(this);
 
         target = getIntent().getStringExtra("target");
         assert target != null;
@@ -40,18 +41,6 @@ public class SearchByPatternActivity extends AppCompatActivity {
         assert prefix != null;
 
         loadItems(prefix);
-
-        Button buttonHome = findViewById(R.id.buttonHome);
-        buttonHome.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-        });
-
-        Button buttonBack = findViewById(R.id.buttonBack);
-        buttonBack.setOnClickListener(v -> {
-            finish();
-        });
 
         EditText searchEditText = findViewById(R.id.searchEditText);
         searchEditText.setText(prefix);

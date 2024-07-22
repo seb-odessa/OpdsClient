@@ -7,12 +7,15 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.opds.utils.Navigation;
+
 public class AuthorActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_author);
+        Navigation.create(this);
 
         final String author = getIntent().getStringExtra("author");
         assert author != null;
@@ -74,16 +77,5 @@ public class AuthorActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        Button buttonHome = findViewById(R.id.buttonHome);
-        buttonHome.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-        });
-
-        Button buttonBack = findViewById(R.id.buttonBack);
-        buttonBack.setOnClickListener(v -> {
-            finish();
-        });
     }
 }

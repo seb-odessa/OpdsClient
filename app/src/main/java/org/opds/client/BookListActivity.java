@@ -1,9 +1,7 @@
 package org.opds.client;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -12,22 +10,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.opds.api.jni.Wrapper;
 import org.opds.api.models.Book;
 import org.opds.client.adapters.BookAdapter;
+import org.opds.utils.Navigation;
 
 import java.util.Comparator;
 import java.util.List;
 
 public class BookListActivity extends AppCompatActivity {
 
-    public enum Sort {
-        BY_TITLE,
-        BY_DATE,
-        BY_SERIE
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_books);
+        Navigation.create(this);
 
         final String author = getIntent().getStringExtra("author");
         assert author != null;
@@ -63,18 +57,6 @@ public class BookListActivity extends AppCompatActivity {
                 break;
             }
         }
-
-        Button buttonHome = findViewById(R.id.buttonHome);
-        buttonHome.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-        });
-
-        Button buttonBack = findViewById(R.id.buttonBack);
-        buttonBack.setOnClickListener(v -> {
-            finish();
-        });
     }
 
     private void loadBooks(Wrapper.Result<List<Book>> result, Sort sort) {
@@ -109,5 +91,11 @@ public class BookListActivity extends AppCompatActivity {
             TextView selectedItem = findViewById(R.id.selectedItemTextView);
             selectedItem.setText(result.getError());
         }
+    }
+
+    public enum Sort {
+        BY_TITLE,
+        BY_DATE,
+        BY_SERIE
     }
 }

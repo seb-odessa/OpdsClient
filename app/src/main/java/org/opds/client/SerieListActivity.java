@@ -3,7 +3,6 @@ package org.opds.client;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -13,6 +12,7 @@ import org.opds.api.jni.Wrapper;
 import org.opds.api.models.Author;
 import org.opds.api.models.Serie;
 import org.opds.client.adapters.SerieAdapter;
+import org.opds.utils.Navigation;
 
 import java.util.List;
 
@@ -22,6 +22,8 @@ public class SerieListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_series);
+        Navigation.create(this);
+
         final String author = getIntent().getStringExtra("author");
         if (author != null) {
             TextView selectedItem = findViewById(R.id.selectedItemTextView);
@@ -41,18 +43,6 @@ public class SerieListActivity extends AppCompatActivity {
                 break;
             }
         }
-
-        Button buttonHome = findViewById(R.id.buttonHome);
-        buttonHome.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-        });
-
-        Button buttonBack = findViewById(R.id.buttonBack);
-        buttonBack.setOnClickListener(v -> {
-            finish();
-        });
     }
 
     private void loadSeries(Wrapper.Result<List<Serie>> result) {
