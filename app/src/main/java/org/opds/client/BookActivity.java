@@ -79,25 +79,25 @@ public class BookActivity extends AppCompatActivity {
 
     private void loadBooks(Wrapper.Result<List<Book>> result, Sort sort) {
         if (result.isSuccess()) {
-            List<Book> books = result.getValue();
+            List<Book> items = result.getValue();
             switch (sort) {
                 case BY_DATE:
-                    books.sort(Comparator.comparing(Book::getAdded).reversed());
+                    items.sort(Comparator.comparing(Book::getAdded).reversed());
                     break;
                 case BY_SERIE:
-                    books.sort(Comparator.comparingInt(Book::getSerieIndex));
+                    items.sort(Comparator.comparingInt(Book::getSerieIndex));
                     break;
             }
 
-            BookAdapter adapter = new BookAdapter(this, books);
-            ListView listView = findViewById(R.id.booksView);
+            BookAdapter adapter = new BookAdapter(this, items);
+            ListView listView = findViewById(R.id.itemsView);
             listView.setAdapter(adapter);
             listView.setVisibility(View.VISIBLE);
             listView.setOnItemClickListener((parent, view, position, id) -> {
-                Book book = adapter.getItem(position);
-                assert book != null;
+                Book item = adapter.getItem(position);
+                assert item != null;
                 TextView selectedItem = findViewById(R.id.selectedItemTextView);
-                selectedItem.setText(book.toString());
+                selectedItem.setText(item.toString());
 //                Intent intent = new Intent(this, AuthorActivity.class);
 //                intent.putExtra("author", author.toString());
 //                intent.putExtra("fid", author.first_name.id);

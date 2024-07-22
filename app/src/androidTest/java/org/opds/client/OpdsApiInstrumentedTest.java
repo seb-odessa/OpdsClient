@@ -123,7 +123,7 @@ public class OpdsApiInstrumentedTest {
 
     @Test
     public void getMetaGenres() {
-        Wrapper.Result<List<Value>> result = api.getMetaGenres();
+        Wrapper.Result<List<String>> result = api.getMetaGenres();
         assertTrue(result.isSuccess());
         assertEquals(List.of("Деловая литература", "Детективы и Триллеры", "Документальная литература", "Дом и семья", "Драматургия", "Искусство, Искусствоведение, Дизайн", "Компьютеры и Интернет", "Литература для детей", "Любовные романы", "Наука, Образование", "Поэзия", "Приключения", "Проза", "Прочее", "Религия, духовность, Эзотерика", "Справочная литература", "Старинное", "Техника", "Учебники и пособия", "Фантастика", "Фольклор", "Эзотерика", "Юмор"), toListOfStrings(result));
     }

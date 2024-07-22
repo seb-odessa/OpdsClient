@@ -1,4 +1,6 @@
 package org.opds.api.models;
+import androidx.annotation.NonNull;
+
 import java.util.Objects;
 
 public class Value {
@@ -10,6 +12,7 @@ public class Value {
         this.value = value;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return value;

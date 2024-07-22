@@ -64,7 +64,7 @@ public class Wrapper {
             return Wrapper.getSeriesByAuthorIds(this.ptr, fid, mid, lid);
         }
 
-        public Wrapper.Result<List<Value>> getMetaGenres() {
+        public Wrapper.Result<List<String>> getMetaGenres() {
             return Wrapper.getMetaGenres(this.ptr);
         }
 
@@ -129,7 +129,7 @@ public class Wrapper {
 
     public static native Result<List<Serie>> getSeriesByAuthorIds(long api, int fid, int mid, int lid);
 
-    public static native Result<List<Value>> getMetaGenres(long api);
+    public static native Result<List<String>> getMetaGenres(long api);
 
     public static native Result<List<Value>> getGenresByMeta(long api, String name);
 

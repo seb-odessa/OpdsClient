@@ -9,26 +9,26 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import org.opds.api.models.Author;
+import org.opds.api.models.Value;
 
 import java.util.List;
 
-public class AuthorAdapter extends ArrayAdapter<Author> {
+public class ValueAdapter extends ArrayAdapter<Value> {
 
-    public AuthorAdapter(Context context, List<Author> authors) {
-        super(context, 0, authors);
+    public ValueAdapter(Context context, List<Value> values) {
+        super(context, 0, values);
     }
 
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        Author author = getItem(position);
+        Value value = getItem(position);
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
         }
         TextView textView = convertView.findViewById(android.R.id.text1);
-        assert author != null;
-        textView.setText(author.toString());
+        assert value != null;
+        textView.setText(value.value);
         return convertView;
     }
 }

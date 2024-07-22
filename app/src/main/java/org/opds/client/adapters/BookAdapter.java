@@ -15,8 +15,8 @@ import java.util.List;
 
 public class BookAdapter extends ArrayAdapter<Book> {
 
-    public BookAdapter(Context context, List<Book> series) {
-        super(context, 0, series);
+    public BookAdapter(Context context, List<Book> books) {
+        super(context, 0, books);
     }
 
     @NonNull

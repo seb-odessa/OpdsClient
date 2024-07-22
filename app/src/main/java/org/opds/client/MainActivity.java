@@ -1,5 +1,6 @@
 package org.opds.client;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -41,6 +42,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 openSearchByPatternActivity("series");
+            }
+        });
+
+        final Context ctx = this;
+        Button searchGenres = findViewById(R.id.search_by_genres);
+        searchGenres.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Intent intent = new Intent(ctx, MetaActivity.class);
+                startActivity(intent);
             }
         });
     }
