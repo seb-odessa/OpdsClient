@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/book"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="6dp">
+
+    <include layout="@layout/navigation" />
+
+    <TextView
+        android:id="@+id/book_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/book_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:textSize="16sp" />
+    <TextView
+        android:id="@+id/book_size"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:textSize="16sp" />
+    <TextView
+        android:id="@+id/book_added"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/read_book"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/read_book" />
+
+    <ListView
+        android:id="@+id/itemsView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="6dp"
+        android:layout_weight="1" />
+
+    <ListView
+        android:id="@+id/libs"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="6dp"
+        android:layout_weight="1" />
+</LinearLayout>

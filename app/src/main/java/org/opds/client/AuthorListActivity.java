@@ -74,7 +74,7 @@ public class AuthorListActivity extends AppCompatActivity {
         });
     }
 
-    private void loadItems(Wrapper.Result<List<Author>> result) {
+    public void loadItems(Wrapper.Result<List<Author>> result) {
         if (result.isSuccess()) {
             items = result.getValue();
             filtered = new ArrayList<>(items);;

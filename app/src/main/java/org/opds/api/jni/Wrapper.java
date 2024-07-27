@@ -101,6 +101,8 @@ public class Wrapper {
         }
     }
 
+    public static native void initLogging();
+
     public static native long createOpdsApi(String dbPath);
 
     public static native void destroyOpdsApi(long api);
@@ -174,4 +176,10 @@ public class Wrapper {
             return error;
         }
     }
+
+    public static native Result<List<String>> findLibraries(String root);
+
+    public static native Result<List<String>> findArchives(String root, int id);
+
+    public static native Result<String> extractFile(String archive, String file, String destination);
 }

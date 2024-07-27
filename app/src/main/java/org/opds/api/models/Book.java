@@ -1,5 +1,9 @@
 package org.opds.api.models;
 
+import android.annotation.SuppressLint;
+
+import androidx.annotation.NonNull;
+
 import java.util.Locale;
 import java.util.Objects;
 
@@ -24,6 +28,17 @@ public class Book {
         this.added = added;
     }
 
+    @SuppressLint("DefaultLocale")
+    public static String format(int size) {
+        if (size >= MB) {
+            return String.format(Locale.US, "%.2f MB", size / MB);
+        } else if (size >= KB) {
+            return String.format(Locale.US, "%.2f KB", size / KB);
+        } else {
+            return String.format("%d B", size);
+        }
+    }
+
     public String getTitle() {
         return name;
     }
@@ -36,30 +51,19 @@ public class Book {
         return idx;
     }
 
-
+    @NonNull
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
         if (0 != idx) {
-            sb.append(idx + " ");
+            sb.append(idx).append(" ");
         }
-        sb.append(name + " - " + author + " (" + added + ") [" + format(size) + "]");
+        sb.append(name).append(" - ").append(author).append(" (").append(added).append(") [").append(format(size)).append("]");
 
         return sb.toString();
     }
 
-    private String format(int size) {
-        if (size >= MB) {
-            return String.format(Locale.US, "%.2f MB", size / MB);
-        } else if (size >= KB) {
-            return String.format(Locale.US, "%.2f KB", size / KB);
-        } else {
-            return String.format("%d B", size);
-        }
-    }
-
-    // Метод equals()
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -76,7 +80,6 @@ public class Book {
                 Objects.equals(added, book.added);
     }
 
-    // Метод hashCode()
     @Override
     public int hashCode() {
         return Objects.hash(id, name, sid, idx, author, size, added);

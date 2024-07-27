@@ -1,5 +1,6 @@
 package org.opds.client;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,9 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import org.opds.api.jni.Wrapper;
 import org.opds.api.models.Book;
-import org.opds.api.models.Serie;
 import org.opds.client.adapters.BookAdapter;
-import org.opds.client.adapters.SerieAdapter;
 import org.opds.utils.Navigation;
 
 import java.util.ArrayList;
@@ -77,6 +76,13 @@ public class BookListActivity extends AppCompatActivity {
                 loadItems(result, Sort.BY_TITLE);
                 break;
             }
+            case "books_by_genre_and_date": {
+                final String date = getIntent().getStringExtra("date");
+                assert date != null;
+                Wrapper.Result<List<Book>> result = app.getApi().getBooksByGenreIdAndDate(gid, date);
+                loadItems(result, Sort.BY_DATE);
+                break;
+            }
         }
 
         EditText searchEditText = findViewById(R.id.searchEditText);
@@ -123,16 +129,18 @@ public class BookListActivity extends AppCompatActivity {
             listView.setAdapter(adapter);
             listView.setVisibility(View.VISIBLE);
             listView.setOnItemClickListener((parent, view, position, id) -> {
-                Book item = adapter.getItem(position);
-                assert item != null;
+                Book book = adapter.getItem(position);
+                assert book != null;
                 TextView selectedItem = findViewById(R.id.selectedItemTextView);
-                selectedItem.setText(item.toString());
-//                Intent intent = new Intent(this, AuthorActivity.class);
-//                intent.putExtra("author", author.toString());
-//                intent.putExtra("fid", author.first_name.id);
-//                intent.putExtra("mid", author.middle_name.id);
-//                intent.putExtra("lid", author.last_name.id);
-//                startActivity(intent);
+                selectedItem.setText(book.toString());
+                Intent intent = new Intent(this, BookActivity.class);
+                intent.putExtra("id", book.id);
+                intent.putExtra("sid", book.sid);
+                intent.putExtra("idx", book.idx);
+                intent.putExtra("title", book.name);
+                intent.putExtra("size", book.size);
+                intent.putExtra("added", book.added);
+                startActivity(intent);
             });
         } else {
             TextView selectedItem = findViewById(R.id.selectedItemTextView);

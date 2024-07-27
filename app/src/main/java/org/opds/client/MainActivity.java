@@ -1,30 +1,44 @@
 package org.opds.client;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import org.opds.api.jni.Wrapper;
 import org.opds.client.databinding.ActivityMainBinding;
-import org.opds.utils.FileUtils;
+
+import java.io.File;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
+    private static final int REQUEST_CODE_PERMISSIONS = 1001;
+    private static final String TAG = "org.opds.client.MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Wrapper.initLogging();
 
         org.opds.client.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        String dbPath = FileUtils.copyAssetToInternalStorage(this, "books.db");
-        String uri = String.format("file:%s?mode=ro", dbPath);
-        AppContext app = (AppContext) getApplicationContext();
-        app.reset(uri);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSIONS);
+        } else {
+            initLibrary();
+        }
 
         Button searchAuthors = findViewById(R.id.search_authors);
         searchAuthors.setOnClickListener(new View.OnClickListener() {
@@ -51,6 +65,57 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                initLibrary();
+            } else {
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void initLibrary() {
+        File[] externalStorageFiles = getExternalFilesDirs(null);
+        if (externalStorageFiles.length > 0) {
+            for (File externalStorage : externalStorageFiles) {
+                if (externalStorage != null) {
+                    String storagePath = getStorageRoot(externalStorage.getAbsolutePath());
+                    Log.d(TAG, "Storage: " + storagePath);
+
+                    Wrapper.Result<List<String>> result = Wrapper.findLibraries(storagePath);
+                    if (result.isSuccess()) {
+                        for (String path : result.getValue()) {
+                            Log.d(TAG, "Library: " + path);
+                            String database = String.format("file:%s/books.db?mode=ro", path);
+                            Log.d(TAG, "Library URI: " + database);
+                            AppContext app = (AppContext) getApplicationContext();
+                            app.setLibraryPath(path);
+                            app.openDatabase(database);
+                        }
+                    } else {
+                        Log.d(TAG, "Error: " + result.getError());
+                    }
+                } else {
+                    Log.d(TAG, "No secondary external storage found.");
+                }
+            }
+        } else {
+            Log.d(TAG, "No external storage found.");
+        }
+    }
+
+    public static String getStorageRoot(String path) {
+        String[] segments = path.split("/");
+        if (segments.length >= 3) {
+            return "/" + segments[1] + "/" + segments[2];
+        } else {
+            return "";
+        }
     }
 
     private void openSearchByPatternActivity(String target) {

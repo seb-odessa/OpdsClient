@@ -3,11 +3,16 @@ package org.opds.client;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.opds.utils.Navigation;
+
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class GenreActivity extends AppCompatActivity {
 
@@ -50,6 +55,31 @@ public class GenreActivity extends AppCompatActivity {
             intent.putExtra("genre", genre);
             startActivity(intent);
         });
+
+        DateTimeFormatter queryFmt = DateTimeFormatter.ofPattern("yyyy-MM-%");
+        DateTimeFormatter textFmt = DateTimeFormatter.ofPattern("Поступления за LLLL yyyy", new Locale("ru"));
+
+        YearMonth currentMonth = YearMonth.now();
+        LinearLayout linearLayout = findViewById(R.id.genre_buttons);
+        for (int i = 0; i < 12; i++) {
+            YearMonth month = currentMonth.minusMonths(i);
+            Button button = new Button(this);
+            button.setText(month.format(textFmt));
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            button.setLayoutParams(layoutParams);
+            button.setOnClickListener(v -> {
+                Intent intent = new Intent(this, BookListActivity.class);
+                intent.putExtra("queryType", "books_by_genre_and_date");
+                intent.putExtra("gid", gid);
+                intent.putExtra("genre", genre);
+                intent.putExtra("date", month.format(queryFmt));
+                startActivity(intent);
+            });
+            linearLayout.addView(button);
+        }
 
     }
 }

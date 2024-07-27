@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "org.opds.client"
-        minSdk = 26
+        minSdk = 29
         //noinspection OldTargetApi
         targetSdk = 33
         versionCode = 1
@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.constraintlayout)
     implementation(libs.activity)
+    implementation(libs.ui.text.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

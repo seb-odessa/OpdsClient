@@ -19,4 +19,5 @@
     <string name="authors_by_genre">Авторы по жанру</string>
     <string name="series_by_genre">Серии по жанру</string>
     <string name="books_by_genre">Книги по жанру</string>
+    <string name="read_book">Читать</string>
 </resources>
