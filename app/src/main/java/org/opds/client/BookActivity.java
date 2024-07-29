@@ -37,6 +37,7 @@ public class BookActivity extends AppCompatActivity {
 
     private int bookId = 0;
     private String bookFile = "";
+    private AppContext app = null;
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -44,35 +45,38 @@ public class BookActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book);
         Navigation.create(this);
+        TextView selected = findViewById(R.id.selectedItemTextView);
 
         bookId = getIntent().getIntExtra("id", 0);
         bookFile = String.format("%s%s", bookId, bookExtension);
-        final int sid = getIntent().getIntExtra("sid", 0);
-        final int idx = getIntent().getIntExtra("idx", 0);
-        final int size = getIntent().getIntExtra("size", 0);
 
-        final String title = getIntent().getStringExtra("title");
-        assert title != null;
-        final String added = getIntent().getStringExtra("added");
-        assert added != null;
+        app = (AppContext) getApplicationContext();
+        Wrapper.Result<Book> result = app.getApi().getBookById(bookId);
+        if (result.isSuccess()) {
+            Book book = result.getValue();
+            TextView bookFile = findViewById(R.id.book_id);
+            bookFile.setText(String.format("Id: %d", book.id));
+            TextView bookTitle = findViewById(R.id.book_title);
+            if (book.idx > 0) {
+                final String title = String.format("%d. %s", book.idx, book.name);
+                bookTitle.setText(title);
+                selected.setText(title);
+            } else {
+                bookTitle.setText(book.name);
+                selected.setText(book.name);
+            }
 
-        TextView bookFile = findViewById(R.id.book_id);
-        bookFile.setText(String.format("Id: %d", bookId));
-        TextView bookTitle = findViewById(R.id.book_title);
-        TextView selected = findViewById(R.id.selectedItemTextView);
-        if (idx > 0) {
-            final String titleWithIdx = String.format("%d. %s", idx, title);
-            bookTitle.setText(titleWithIdx);
-            selected.setText(titleWithIdx);
+            TextView bookSize = findViewById(R.id.book_size);
+            bookSize.setText(String.format("File size: %s", Book.format(book.size)));
+            TextView bookAdded = findViewById(R.id.book_added);
+            bookAdded.setText(String.format("Added to the library: %s", book.added));
+
+            loadAuthors(app.getApi().getAuthorsByBooksIds(new int[]{book.id}));
+            loadBooks(app.getApi().getBooksBySerieId(book.sid));
+
         } else {
-            bookTitle.setText(title);
-            selected.setText(title);
+            selected.setText(result.getError());
         }
-
-        TextView bookSize = findViewById(R.id.book_size);
-        bookSize.setText(String.format("File size: %s", Book.format(size)));
-        TextView bookAdded = findViewById(R.id.book_added);
-        bookAdded.setText(String.format("Added to the library: %s", added));
 
         Button buttonRead = findViewById(R.id.read_book);
         buttonRead.setOnClickListener(v -> {
@@ -86,10 +90,6 @@ public class BookActivity extends AppCompatActivity {
                 extractBookFromArchive();
             }
         });
-
-        AppContext app = (AppContext) getApplicationContext();
-        loadAuthors(app.getApi().getAuthorsByBooksIds(new int[]{bookId}));
-        loadBooks(app.getApi().getBooksBySerieId(sid));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
@@ -122,7 +122,7 @@ public class BookActivity extends AppCompatActivity {
     }
 
     private void extractBookFromArchive() {
-        AppContext app = (AppContext) getApplicationContext();
+//        AppContext app = (AppContext) getApplicationContext();
         final String libraryPath = app.getLibraryPath();
         Log.d(TAG, "Book Id: " + bookId);
         Log.d(TAG, "Book File: " + bookFile);
@@ -205,11 +205,6 @@ public class BookActivity extends AppCompatActivity {
                 assert book != null;
                 Intent intent = new Intent(this, BookActivity.class);
                 intent.putExtra("id", book.id);
-                intent.putExtra("sid", book.sid);
-                intent.putExtra("idx", book.idx);
-                intent.putExtra("title", book.name);
-                intent.putExtra("size", book.size);
-                intent.putExtra("added", book.added);
                 startActivity(intent);
             });
         } else {

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">OpdsClient</string>
+    <string name="app_name">Lib.Rus.Ec Opds Client</string>
     <string name="search_by_author">Поиск по авторам</string>
     <string name="search_by_series">Поиск по сериям</string>
     <string name="search_by_genres">Поиск по жанрам</string>

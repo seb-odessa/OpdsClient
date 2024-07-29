@@ -76,6 +76,10 @@ public class Wrapper {
             return Wrapper.getAuthorByIds(this.ptr, fid, mid, lid);
         }
 
+        public Wrapper.Result<Book> getBookById(int bid) {
+            return Wrapper.getBookById(this.ptr, bid);
+        }
+
         public Wrapper.Result<List<Book>> getBooksByAuthorIds(int fid, int mid, int lid) {
             return Wrapper.getBooksByAuthorIds(this.ptr, fid, mid, lid);
         }
@@ -120,6 +124,8 @@ public class Wrapper {
     public static native Result<List<Author>> getAuthorsByBooksIds(long api, int[] ids);
 
     public static native Result<Author> getAuthorByIds(long api, int fid, int mid, int lid);
+
+    public static native Result<Book> getBookById(long api, int bid);
 
     public static native Result<List<String>> getSeriesNextCharByPrefix(long api, String prefix);
 

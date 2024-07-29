@@ -135,11 +135,6 @@ public class BookListActivity extends AppCompatActivity {
                 selectedItem.setText(book.toString());
                 Intent intent = new Intent(this, BookActivity.class);
                 intent.putExtra("id", book.id);
-                intent.putExtra("sid", book.sid);
-                intent.putExtra("idx", book.idx);
-                intent.putExtra("title", book.name);
-                intent.putExtra("size", book.size);
-                intent.putExtra("added", book.added);
                 startActivity(intent);
             });
         } else {
