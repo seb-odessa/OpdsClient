@@ -79,7 +79,7 @@ public class AuthorListActivity extends AppCompatActivity {
             items = result.getValue();
             filtered = new ArrayList<>(items);;
             adapter = new AuthorAdapter(this, filtered);
-            ListView listView = findViewById(R.id.itemsView);
+            ListView listView = findViewById(R.id.authors_of_book);
             listView.setAdapter(adapter);
             listView.setVisibility(View.VISIBLE);
             listView.setOnItemClickListener((parent, view, position, id) -> {

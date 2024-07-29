@@ -10,8 +10,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -25,6 +23,7 @@ import org.opds.api.jni.Wrapper;
 import org.opds.api.models.Author;
 import org.opds.api.models.Book;
 import org.opds.client.adapters.AuthorAdapter;
+import org.opds.client.adapters.BookAdapter;
 import org.opds.utils.Navigation;
 
 import java.io.File;
@@ -32,15 +31,12 @@ import java.util.List;
 
 public class BookActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_MANAGE_EXTERNAL_STORAGE = 1;
-    private static final int REQUEST_CODE_OPEN_DIRECTORY = 2;
-    private static final int REQUEST_CODE_PERMISSIONS = 1001;
     private static final String AUTHORITY = "org.opds.client.provider";
     private static final String TAG = "org.opds.client.BookActivity";
     private static final String bookExtension = ".fb2";
 
     private int bookId = 0;
     private String bookFile = "";
-
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -51,8 +47,8 @@ public class BookActivity extends AppCompatActivity {
 
         bookId = getIntent().getIntExtra("id", 0);
         bookFile = String.format("%s%s", bookId, bookExtension);
-//        final int sid = getIntent().getIntExtra("sid", 0);
-//        final int idx = getIntent().getIntExtra("idx", 0);
+        final int sid = getIntent().getIntExtra("sid", 0);
+        final int idx = getIntent().getIntExtra("idx", 0);
         final int size = getIntent().getIntExtra("size", 0);
 
         final String title = getIntent().getStringExtra("title");
@@ -63,7 +59,16 @@ public class BookActivity extends AppCompatActivity {
         TextView bookFile = findViewById(R.id.book_id);
         bookFile.setText(String.format("Id: %d", bookId));
         TextView bookTitle = findViewById(R.id.book_title);
-        bookTitle.setText(title);
+        TextView selected = findViewById(R.id.selectedItemTextView);
+        if (idx > 0) {
+            final String titleWithIdx = String.format("%d. %s", idx, title);
+            bookTitle.setText(titleWithIdx);
+            selected.setText(titleWithIdx);
+        } else {
+            bookTitle.setText(title);
+            selected.setText(title);
+        }
+
         TextView bookSize = findViewById(R.id.book_size);
         bookSize.setText(String.format("File size: %s", Book.format(size)));
         TextView bookAdded = findViewById(R.id.book_added);
@@ -71,9 +76,6 @@ public class BookActivity extends AppCompatActivity {
 
         Button buttonRead = findViewById(R.id.read_book);
         buttonRead.setOnClickListener(v -> {
-            TextView selected = findViewById(R.id.selectedItemTextView);
-            selected.setText(String.format("%d", bookId));
-
             if (SDK_INT >= Build.VERSION_CODES.R) {
                 if (!Environment.isExternalStorageManager()) {
                     requestPermission();
@@ -86,7 +88,8 @@ public class BookActivity extends AppCompatActivity {
         });
 
         AppContext app = (AppContext) getApplicationContext();
-        loadItems(app.getApi().getAuthorsByBooksIds(new int[]{bookId}));
+        loadAuthors(app.getApi().getAuthorsByBooksIds(new int[]{bookId}));
+        loadBooks(app.getApi().getBooksBySerieId(sid));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
@@ -168,13 +171,12 @@ public class BookActivity extends AppCompatActivity {
         }
     }
 
-    public void loadItems(Wrapper.Result<List<Author>> result) {
+    public void loadAuthors(Wrapper.Result<List<Author>> result) {
         if (result.isSuccess()) {
             List<Author> items = result.getValue();
             AuthorAdapter adapter = new AuthorAdapter(this, items);
-            ListView listView = findViewById(R.id.itemsView);
+            ListView listView = findViewById(R.id.authors_of_book);
             listView.setAdapter(adapter);
-            listView.setVisibility(View.VISIBLE);
             listView.setOnItemClickListener((parent, view, position, id) -> {
                 Author author = adapter.getItem(position);
                 assert author != null;
@@ -191,13 +193,25 @@ public class BookActivity extends AppCompatActivity {
         }
     }
 
-    public void loadItemsLibs(Wrapper.Result<List<String>> result) {
+    public void loadBooks(Wrapper.Result<List<Book>> result) {
         TextView selectedItem = findViewById(R.id.selectedItemTextView);
         if (result.isSuccess()) {
-            List<String> items = result.getValue();
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
-            ListView listView = findViewById(R.id.libs);
+            List<Book> items = result.getValue();
+            BookAdapter adapter = new BookAdapter(this, items);
+            ListView listView = findViewById(R.id.books_in_serie);
             listView.setAdapter(adapter);
+            listView.setOnItemClickListener((parent, view, position, id) -> {
+                Book book = adapter.getItem(position);
+                assert book != null;
+                Intent intent = new Intent(this, BookActivity.class);
+                intent.putExtra("id", book.id);
+                intent.putExtra("sid", book.sid);
+                intent.putExtra("idx", book.idx);
+                intent.putExtra("title", book.name);
+                intent.putExtra("size", book.size);
+                intent.putExtra("added", book.added);
+                startActivity(intent);
+            });
         } else {
             selectedItem.setText(result.getError());
         }

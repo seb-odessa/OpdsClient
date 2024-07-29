@@ -31,7 +31,7 @@ public class MetaListActivity extends AppCompatActivity {
         if (result.isSuccess()) {
             List<String> items = result.getValue();
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
-            ListView listView = findViewById(R.id.itemsView);
+            ListView listView = findViewById(R.id.authors_of_book);
             listView.setAdapter(adapter);
             listView.setVisibility(View.VISIBLE);
             listView.setOnItemClickListener((parent, view, position, id) -> {

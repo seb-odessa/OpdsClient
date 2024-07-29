@@ -35,7 +35,7 @@ public class GenreListActivity extends AppCompatActivity {
         if (result.isSuccess()) {
             List<Value> items = result.getValue();
             ValueAdapter adapter = new ValueAdapter(this, items);
-            ListView listView = findViewById(R.id.itemsView);
+            ListView listView = findViewById(R.id.authors_of_book);
             listView.setAdapter(adapter);
             listView.setVisibility(View.VISIBLE);
             listView.setOnItemClickListener((parent, view, position, id) -> {

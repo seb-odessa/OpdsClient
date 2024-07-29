@@ -39,16 +39,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/read_book" />
-
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:textSize="16sp"
+        android:text="@string/authors_list"/>
     <ListView
-        android:id="@+id/itemsView"
+        android:id="@+id/authors_of_book"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="6dp"
-        android:layout_weight="1" />
+        android:layout_weight="0.1" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:textSize="16sp"
+        android:text="@string/books_in_serie"/>
 
     <ListView
-        android:id="@+id/libs"
+        android:id="@+id/books_in_serie"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="6dp"
