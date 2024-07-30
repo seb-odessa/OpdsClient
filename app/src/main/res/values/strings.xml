@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Lib.Rus.Ec Opds Client</string>
+    <string name="app_name">Lib.Rus.Ec Client</string>
     <string name="search_by_author">Поиск по авторам</string>
     <string name="search_by_series">Поиск по сериям</string>
     <string name="search_by_genres">Поиск по жанрам</string>
@@ -22,4 +22,7 @@
     <string name="read_book">Читать</string>
     <string name="authors_list">Авторы</string>
     <string name="books_in_serie">Книги в серии</string>
+    <string name="last_books">Недавние книги</string>
+    <string name="last_authors">Недавние авторы</string>
+    <string name="last_series">Недавние серии</string>
 </resources>

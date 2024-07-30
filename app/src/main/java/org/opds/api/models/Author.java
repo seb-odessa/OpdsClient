@@ -6,6 +6,10 @@ public class Author {
     public Value first_name;
     public Value middle_name;
     public Value last_name;
+
+    public Author() {
+    }
+
     public Author(Value first_name, Value middle_name, Value last_name) {
         this.first_name = first_name;
         this.middle_name = middle_name;

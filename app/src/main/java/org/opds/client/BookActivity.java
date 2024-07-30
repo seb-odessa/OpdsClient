@@ -3,7 +3,9 @@ package org.opds.client;
 import static android.os.Build.VERSION.SDK_INT;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,25 +21,31 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import org.opds.api.jni.Wrapper;
 import org.opds.api.models.Author;
 import org.opds.api.models.Book;
 import org.opds.client.adapters.AuthorAdapter;
 import org.opds.client.adapters.BookAdapter;
+import org.opds.utils.BooksHistory;
 import org.opds.utils.Navigation;
 
 import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class BookActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_MANAGE_EXTERNAL_STORAGE = 1;
     private static final String AUTHORITY = "org.opds.client.provider";
     private static final String TAG = "org.opds.client.BookActivity";
-    private static final String bookExtension = ".fb2";
 
-    private int bookId = 0;
-    private String bookFile = "";
     private AppContext app = null;
+    Book book = null;
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -47,24 +55,16 @@ public class BookActivity extends AppCompatActivity {
         Navigation.create(this);
         TextView selected = findViewById(R.id.selectedItemTextView);
 
-        bookId = getIntent().getIntExtra("id", 0);
-        bookFile = String.format("%s%s", bookId, bookExtension);
-
         app = (AppContext) getApplicationContext();
-        Wrapper.Result<Book> result = app.getApi().getBookById(bookId);
+        final int bid = getIntent().getIntExtra("id", 0);
+        Wrapper.Result<Book> result = app.getApi().getBookById(bid);
         if (result.isSuccess()) {
-            Book book = result.getValue();
+            book = result.getValue();
             TextView bookFile = findViewById(R.id.book_id);
             bookFile.setText(String.format("Id: %d", book.id));
             TextView bookTitle = findViewById(R.id.book_title);
-            if (book.idx > 0) {
-                final String title = String.format("%d. %s", book.idx, book.name);
-                bookTitle.setText(title);
-                selected.setText(title);
-            } else {
-                bookTitle.setText(book.name);
-                selected.setText(book.name);
-            }
+            bookTitle.setText(book.getTitle());
+            selected.setText(book.getTitle());
 
             TextView bookSize = findViewById(R.id.book_size);
             bookSize.setText(String.format("File size: %s", Book.format(book.size)));
@@ -74,22 +74,21 @@ public class BookActivity extends AppCompatActivity {
             loadAuthors(app.getApi().getAuthorsByBooksIds(new int[]{book.id}));
             loadBooks(app.getApi().getBooksBySerieId(book.sid));
 
-        } else {
-            selected.setText(result.getError());
-        }
-
-        Button buttonRead = findViewById(R.id.read_book);
-        buttonRead.setOnClickListener(v -> {
-            if (SDK_INT >= Build.VERSION_CODES.R) {
-                if (!Environment.isExternalStorageManager()) {
-                    requestPermission();
+            Button buttonRead = findViewById(R.id.read_book);
+            buttonRead.setOnClickListener(v -> {
+                if (SDK_INT >= Build.VERSION_CODES.R) {
+                    if (!Environment.isExternalStorageManager()) {
+                        requestPermission();
+                    } else {
+                        extractBookFromArchive();
+                    }
                 } else {
                     extractBookFromArchive();
                 }
-            } else {
-                extractBookFromArchive();
-            }
-        });
+            });
+        } else {
+            selected.setText(result.getError());
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
@@ -122,14 +121,15 @@ public class BookActivity extends AppCompatActivity {
     }
 
     private void extractBookFromArchive() {
-//        AppContext app = (AppContext) getApplicationContext();
         final String libraryPath = app.getLibraryPath();
-        Log.d(TAG, "Book Id: " + bookId);
+        assert book != null;
+        final String bookFile = String.format("%s.fb2", book.id);
+        Log.d(TAG, "Book Id: " + book.id);
         Log.d(TAG, "Book File: " + bookFile);
         Log.d(TAG, "Library Path: " + libraryPath);
 
         TextView selected = findViewById(R.id.selectedItemTextView); 
-        Wrapper.Result<List<String>> result = Wrapper.findArchives(libraryPath, bookId);
+        Wrapper.Result<List<String>> result = Wrapper.findArchives(libraryPath, book.id);
         if (result.isSuccess()) {
             List<String> archives = result.getValue();
             for(String archive: archives) {
@@ -145,9 +145,11 @@ public class BookActivity extends AppCompatActivity {
                     Log.d(TAG, "Book destination: " + destination);
                     Wrapper.Result<String> maybeOk = Wrapper.extractFile(archive, bookFile, destination);
                     if (maybeOk.isSuccess()) {
-                        File book = new File(destination + "/" +  bookFile);
-                        Log.d(TAG, "File destination: " + book.getAbsolutePath());
-                        openFileWithOtherApp(book);
+                        File path = new File(destination + "/" +  bookFile);
+                        Log.d(TAG, "File destination: " + path.getAbsolutePath());
+                        openFileWithOtherApp(path);
+                        SharedPreferences pref = getSharedPreferences(BooksHistory.TAG, Context.MODE_PRIVATE);
+                        BooksHistory.add(pref, book);
                     } else {
                         selected.setText(maybeOk.getError());
                     }
@@ -160,6 +162,8 @@ public class BookActivity extends AppCompatActivity {
 
     private void openFileWithOtherApp(File file) {
         Uri fileUri = FileProvider.getUriForFile(this, AUTHORITY, file);
+        Log.d(TAG, "openFileWithOtherApp <- " + fileUri);
+
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setDataAndType(fileUri, getContentResolver().getType(fileUri));
         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);

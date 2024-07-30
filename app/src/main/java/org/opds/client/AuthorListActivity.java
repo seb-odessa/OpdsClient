@@ -1,6 +1,8 @@
 package org.opds.client;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.opds.api.jni.Wrapper;
 import org.opds.api.models.Author;
 import org.opds.client.adapters.AuthorAdapter;
+import org.opds.utils.BooksHistory;
 import org.opds.utils.Navigation;
 
 import java.util.ArrayList;
@@ -37,7 +40,7 @@ public class AuthorListActivity extends AppCompatActivity {
 
         AppContext app = (AppContext) getApplicationContext();
         switch (queryType) {
-            case "authors_by_genre":
+            case "authors_by_genre": {
                 final int gid = getIntent().getIntExtra("gid", 0);
                 final String genre = getIntent().getStringExtra("genre");
                 assert genre != null;
@@ -45,6 +48,16 @@ public class AuthorListActivity extends AppCompatActivity {
                 selectedItem.setText(genre);
                 loadItems(app.getApi().getAuthorsByGenreId(gid));
                 break;
+            }
+            case "authors_history": {
+                SharedPreferences pref = getSharedPreferences(BooksHistory.TAG, Context.MODE_PRIVATE);
+                List<Author> authors = BooksHistory.load(pref)
+                        .stream()
+                        .map(book -> book.author)
+                        .collect(Collectors.toList());
+                loadItems(authors);
+                break;
+            }
         }
 
         EditText searchEditText = findViewById(R.id.searchEditText);
@@ -76,26 +89,31 @@ public class AuthorListActivity extends AppCompatActivity {
 
     public void loadItems(Wrapper.Result<List<Author>> result) {
         if (result.isSuccess()) {
-            items = result.getValue();
-            filtered = new ArrayList<>(items);;
-            adapter = new AuthorAdapter(this, filtered);
-            ListView listView = findViewById(R.id.authors_of_book);
-            listView.setAdapter(adapter);
-            listView.setVisibility(View.VISIBLE);
-            listView.setOnItemClickListener((parent, view, position, id) -> {
-                Author author = adapter.getItem(position);
-                assert author != null;
-                Intent intent = new Intent(this, AuthorActivity.class);
-                intent.putExtra("author", author.toString());
-                intent.putExtra("fid", author.first_name.id);
-                intent.putExtra("mid", author.middle_name.id);
-                intent.putExtra("lid", author.last_name.id);
-                startActivity(intent);
-            });
+            loadItems(result.getValue());
         } else {
             TextView selectedItem = findViewById(R.id.selectedItemTextView);
             selectedItem.setText(result.getError());
         }
+    }
+
+    public void loadItems(List<Author> authors) {
+        items = authors;
+        filtered = new ArrayList<>(items);
+
+        adapter = new AuthorAdapter(this, filtered);
+        ListView listView = findViewById(R.id.authors_of_book);
+        listView.setAdapter(adapter);
+        listView.setVisibility(View.VISIBLE);
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            Author author = adapter.getItem(position);
+            assert author != null;
+            Intent intent = new Intent(this, AuthorActivity.class);
+            intent.putExtra("author", author.toString());
+            intent.putExtra("fid", author.first_name.id);
+            intent.putExtra("mid", author.middle_name.id);
+            intent.putExtra("lid", author.last_name.id);
+            startActivity(intent);
+        });
     }
 
 }

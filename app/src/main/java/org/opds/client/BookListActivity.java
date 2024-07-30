@@ -1,9 +1,12 @@
 package org.opds.client;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -11,17 +14,23 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import org.opds.api.jni.Wrapper;
 import org.opds.api.models.Book;
 import org.opds.client.adapters.BookAdapter;
+import org.opds.utils.BooksHistory;
 import org.opds.utils.Navigation;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class BookListActivity extends AppCompatActivity {
+    private static final String TAG = "org.opds.client.BookListActivity";
     List<Book> items;
     List<Book> filtered;
     BookAdapter adapter;
@@ -53,34 +62,39 @@ public class BookListActivity extends AppCompatActivity {
         switch (queryType) {
             case "books_by_author_and_serie": {
                 Wrapper.Result<List<Book>> result = app.getApi().getBooksByAuthorIdsAndSerieId(fid, mid, lid, sid);
-                loadItems(result, Sort.BY_SERIE);
+                loadItems(result, Sort.RESORT_BY_SERIE_INDEX);
                 break;
             }
             case "books_without_series": {
                 Wrapper.Result<List<Book>> result = app.getApi().getBooksByAuthorIdsWithoutSerie(fid, mid, lid);
-                loadItems(result, Sort.BY_TITLE);
+                loadItems(result, Sort.KEEP_ORIGINAL_ORDER);
                 break;
             }
             case "books_by_alphabet": {
                 Wrapper.Result<List<Book>> result = app.getApi().getBooksByAuthorIds(fid, mid, lid);
-                loadItems(result, Sort.BY_TITLE);
+                loadItems(result, Sort.KEEP_ORIGINAL_ORDER);
                 break;
             }
             case "books_by_date": {
                 Wrapper.Result<List<Book>> result = app.getApi().getBooksByAuthorIds(fid, mid, lid);
-                loadItems(result, Sort.BY_DATE);
+                loadItems(result, Sort.RESORT_BY_DATE);
                 break;
             }
             case "books_by_genre": {
                 Wrapper.Result<List<Book>> result = app.getApi().getBooksByGenreIdAndDate(gid, "%");
-                loadItems(result, Sort.BY_TITLE);
+                loadItems(result, Sort.KEEP_ORIGINAL_ORDER);
                 break;
             }
             case "books_by_genre_and_date": {
                 final String date = getIntent().getStringExtra("date");
                 assert date != null;
                 Wrapper.Result<List<Book>> result = app.getApi().getBooksByGenreIdAndDate(gid, date);
-                loadItems(result, Sort.BY_DATE);
+                loadItems(result, Sort.RESORT_BY_DATE);
+                break;
+            }
+            case "books_history": {
+                SharedPreferences pref = getSharedPreferences(BooksHistory.TAG, Context.MODE_PRIVATE);
+                loadItems(BooksHistory.load(pref), Sort.KEEP_ORIGINAL_ORDER);
                 break;
             }
         }
@@ -114,38 +128,42 @@ public class BookListActivity extends AppCompatActivity {
 
     private void loadItems(Wrapper.Result<List<Book>> result, Sort sort) {
         if (result.isSuccess()) {
-            items = result.getValue();
-            switch (sort) {
-                case BY_DATE:
-                    items.sort(Comparator.comparing(Book::getAdded).reversed());
-                    break;
-                case BY_SERIE:
-                    items.sort(Comparator.comparingInt(Book::getSerieIndex));
-                    break;
-            }
-            filtered = new ArrayList<>(items);
-            adapter = new BookAdapter(this, filtered);
-            ListView listView = findViewById(R.id.authors_of_book);
-            listView.setAdapter(adapter);
-            listView.setVisibility(View.VISIBLE);
-            listView.setOnItemClickListener((parent, view, position, id) -> {
-                Book book = adapter.getItem(position);
-                assert book != null;
-                TextView selectedItem = findViewById(R.id.selectedItemTextView);
-                selectedItem.setText(book.toString());
-                Intent intent = new Intent(this, BookActivity.class);
-                intent.putExtra("id", book.id);
-                startActivity(intent);
-            });
+            loadItems(result.getValue(), sort);
         } else {
             TextView selectedItem = findViewById(R.id.selectedItemTextView);
             selectedItem.setText(result.getError());
         }
     }
 
+    private void loadItems(List<Book> items, Sort sort) {
+        switch (sort) {
+            case RESORT_BY_DATE:
+                items.sort(Comparator.comparing(Book::getAdded).reversed());
+                break;
+            case RESORT_BY_SERIE_INDEX:
+                items.sort(Comparator.comparingInt(Book::getSerieIndex));
+                break;
+        }
+        filtered = new ArrayList<>(items);
+        adapter = new BookAdapter(this, filtered);
+        ListView listView = findViewById(R.id.authors_of_book);
+        listView.setAdapter(adapter);
+        listView.setVisibility(View.VISIBLE);
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            Book book = adapter.getItem(position);
+            assert book != null;
+            TextView selectedItem = findViewById(R.id.selectedItemTextView);
+            selectedItem.setText(book.toString());
+            Intent intent = new Intent(this, BookActivity.class);
+            intent.putExtra("id", book.id);
+            startActivity(intent);
+        });
+
+    }
+
     public enum Sort {
-        BY_TITLE,
-        BY_DATE,
-        BY_SERIE
+        KEEP_ORIGINAL_ORDER,
+        RESORT_BY_DATE,
+        RESORT_BY_SERIE_INDEX
     }
 }

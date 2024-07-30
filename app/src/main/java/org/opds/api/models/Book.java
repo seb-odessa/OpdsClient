@@ -4,9 +4,14 @@ import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.Locale;
 import java.util.Objects;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Book {
     public static final double KB = 1024.0;
     public static final double MB = 1024.0 * KB;
@@ -17,6 +22,9 @@ public class Book {
     public Author author;
     public int size;
     public String added;
+
+    public Book() {
+    }
 
     public Book(int id, String name, int sid, int idx, Author author, int size, String added) {
         this.id = id;
@@ -40,7 +48,9 @@ public class Book {
     }
 
     public String getTitle() {
-        return name;
+        return (idx > 0)
+                ? String.format(Locale.US, "%d. %s", idx, name)
+                : name;
     }
 
     public String getAdded() {
@@ -83,5 +93,15 @@ public class Book {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, sid, idx, author, size, added);
+    }
+
+    public String serialize() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(this);
+    }
+
+    public static Book deserialize(String json) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(json, Book.class);
     }
 }

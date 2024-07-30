@@ -7,6 +7,9 @@ public class Value {
     public int id;
     public String value;
 
+    public Value() {
+    }
+
     public Value(int id, String value) {
         this.id = id;
         this.value = value;

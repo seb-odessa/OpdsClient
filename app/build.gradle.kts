@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.activity)
     implementation(libs.ui.text.android)
+    implementation(libs.jackson.databind)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

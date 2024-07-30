@@ -1,12 +1,10 @@
 package org.opds.client;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -41,30 +39,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Button searchAuthors = findViewById(R.id.search_authors);
-        searchAuthors.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openSearchByPatternActivity("authors");
-            }
-        });
+        searchAuthors.setOnClickListener(v -> openSearchByPatternActivity("authors"));
 
         Button searchSeries = findViewById(R.id.search_series);
-        searchSeries.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openSearchByPatternActivity("series");
-            }
-        });
+        searchSeries.setOnClickListener(v -> openSearchByPatternActivity("series"));
 
-        final Context ctx = this;
         Button searchGenres = findViewById(R.id.search_by_genres);
-        searchGenres.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Intent intent = new Intent(ctx, MetaListActivity.class);
-                startActivity(intent);
-            }
-        });
+        searchGenres.setOnClickListener(v -> openSearchByGenreActivity());
+
+        Button lastBooks = findViewById(R.id.last_books);
+        lastBooks.setOnClickListener(v -> openLastBooksActivity());
+
+        Button lastAuthors = findViewById(R.id.last_authors);
+        lastAuthors.setOnClickListener(v -> openLastAuthorsActivity());
     }
 
     @Override
@@ -122,6 +109,23 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SearchByPatternActivity.class);
         intent.putExtra("target", target);
         intent.putExtra("prefix", "");
+        startActivity(intent);
+    }
+
+    private void openSearchByGenreActivity() {
+        Intent intent = new Intent(this, MetaListActivity.class);
+        startActivity(intent);
+    }
+
+    private void openLastBooksActivity() {
+        Intent intent = new Intent(this, BookListActivity.class);
+        intent.putExtra("queryType", "books_history");
+        startActivity(intent);
+    }
+
+    private void openLastAuthorsActivity() {
+        Intent intent = new Intent(this, AuthorListActivity.class);
+        intent.putExtra("queryType", "authors_history");
         startActivity(intent);
     }
 }
