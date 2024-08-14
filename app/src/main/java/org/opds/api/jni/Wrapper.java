@@ -60,6 +60,10 @@ public class Wrapper {
             return Wrapper.getBooksByGenreIdAndDate(this.ptr, id, date);
         }
 
+        public Wrapper.Result<List<Serie>> getSeriesByIds(int[] ids) {
+            return Wrapper.getSeriesByIds(this.ptr, ids);
+        }
+
         public Wrapper.Result<List<Serie>> getSeriesByAuthorIds(int fid, int mid, int lid) {
             return Wrapper.getSeriesByAuthorIds(this.ptr, fid, mid, lid);
         }
@@ -103,6 +107,18 @@ public class Wrapper {
         public Wrapper.Result<Pair<List<String>>> getSeriesByPrefix(String prefix) {
             return Wrapper.getSeriesByPrefix(this.ptr, prefix);
         }
+
+        public Result<List<String>> getBooksNextCharByPrefix(String prefix) {
+            return Wrapper.getBooksNextCharByPrefix(this.ptr, prefix);
+        }
+
+        public Wrapper.Result<Pair<List<String>>> getBooksByPrefix(String prefix) {
+            return Wrapper.getBooksByPrefix(this.ptr, prefix);
+        }
+
+        public Wrapper.Result<List<Book>> getBooksByBookTitle(String name) {
+            return Wrapper.getBooksByBookTitle(this.ptr, name);
+        }
     }
 
     public static native void initLogging();
@@ -133,13 +149,21 @@ public class Wrapper {
 
     public static native Result<List<Serie>> getSeriesBySerieName(long api, String name);
 
+    public static native Result<List<Book>> getBooksByBookTitle(long api, String name);
+
     public static native Result<List<Serie>> getSeriesByGenreId(long api, int id);
 
     public static native Result<List<Serie>> getSeriesByAuthorIds(long api, int fid, int mid, int lid);
 
+    public static native Result<List<Serie>> getSeriesByIds(long api, int[] ids);
+
     public static native Result<List<String>> getMetaGenres(long api);
 
     public static native Result<List<Value>> getGenresByMeta(long api, String name);
+
+    public static native Result<List<String>> getBooksNextCharByPrefix(long api, String prefix);
+
+    public static native Result<Pair<List<String>>> getBooksByPrefix(long api, String prefix);
 
     public static native Result<List<Book>> getBooksByGenreIdAndDate(long api, int id, String date);
 

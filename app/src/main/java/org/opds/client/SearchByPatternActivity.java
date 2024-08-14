@@ -1,10 +1,11 @@
 package org.opds.client;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
-import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -15,17 +16,27 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import org.opds.api.jni.Wrapper;
 import org.opds.api.models.Author;
+import org.opds.api.models.Book;
 import org.opds.api.models.Pair;
 import org.opds.api.models.Serie;
 import org.opds.client.adapters.AuthorAdapter;
+import org.opds.client.adapters.BookAdapter;
 import org.opds.client.adapters.SerieAdapter;
+import org.opds.utils.ErrorReporter;
 import org.opds.utils.Navigation;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class SearchByPatternActivity extends AppCompatActivity {
+    private static final String TAG = "org.opds.client.SearchByPatternActivity";
+    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private static Handler mainHandler = new Handler(Looper.getMainLooper());
 
+    private ErrorReporter errorReporter = null;
+    private AppContext app = null;
     private String target;
 
     @Override
@@ -33,66 +44,74 @@ public class SearchByPatternActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_by_pattern);
         Navigation.create(this);
+        app = (AppContext) getApplicationContext();
+        errorReporter = new ErrorReporter(this, TAG);
 
         target = getIntent().getStringExtra("target");
         assert target != null;
 
-        final String prefix = getIntent().getStringExtra("prefix");
-        assert prefix != null;
+        String prefix = getIntent().getStringExtra("prefix");
+        if (prefix == null) {
+            prefix = "";
+        }
 
         loadItems(prefix);
 
         EditText searchEditText = findViewById(R.id.searchEditText);
         searchEditText.setText(prefix);
-        searchEditText.addTextChangedListener(new TextWatcher() {
+        Navigation.afterTextChanged(searchEditText, new Navigation.AfterTextChanged() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // No action needed
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String prefix = s.toString();
+            public void afterTextChanged(Editable editable) {
+                final String prefix = editable.toString();
+                Log.d(TAG, "afterTextChanged: '" + prefix + "'");
                 if (!prefix.isEmpty()) {
-                    loadItems(prefix);
+                    executorService.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadItems(prefix);
+                        }
+                    });
+//                  loadItems(prefix);
                 }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // No action needed
             }
         });
     }
 
-    private void loadItems(String prefix) {
+    private void loadItems(final String prefix) {
+        Log.d(TAG, "loadItems <- '" + prefix+ "'");
         Wrapper.Result<Pair<List<String>>> result = getSearchResult(prefix);
-        TextView currentPrefix;
-        if (result.isSuccess()) {
-            currentPrefix = findViewById(R.id.selectedItemTextView);
-            currentPrefix.setText(prefix);
 
-            loadFullMatched(findViewById(R.id.exactListView), result.getValue().first);
-            loadRestPrefixes(findViewById(R.id.nvcListView), result.getValue().second);
-        } else {
-            currentPrefix = findViewById(R.id.selectedItemTextView);
-            currentPrefix.setText(result.getError());
-        }
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "loadItems: " + result.isSuccess());
+                if (result.isSuccess()) {
+                    TextView currentPrefix = findViewById(R.id.selectedItemTextView);
+                    currentPrefix.setText(prefix);
+                    loadFullMatched(findViewById(R.id.exactListView), result.getValue().first);
+                    loadRestPrefixes(findViewById(R.id.nvcListView), result.getValue().second);
+                } else {
+                    errorReporter.report("loadItems()", result.getError());
+                }
+                Log.d(TAG, "loadItems: Done");
+            }
+        });
     }
 
     private Wrapper.Result<Pair<List<String>>> getSearchResult(String prefix) {
-        AppContext app = (AppContext) getApplicationContext();
-        if (target.equals("authors")) {
-            return app.getApi().getAuthorsByPrefix(prefix);
-        } else if (target.equals("series")) {
-            return app.getApi().getSeriesByPrefix(prefix);
-        } else {
-            return Wrapper.Result.error("Empty target. Must be `authors` or `series`");
+        switch (target) {
+            case "authors":
+                return app.getApi().getAuthorsByPrefix(prefix);
+            case "series":
+                return app.getApi().getSeriesByPrefix(prefix);
+            case "books":
+                return app.getApi().getBooksByPrefix(prefix);
+            default:
+                return Wrapper.Result.error("Empty target. Must be `authors` or `series`");
         }
     }
 
     private List<Author> loadMatchedAuthors(List<String> names) {
-        AppContext app = (AppContext) getApplicationContext();
         return names.stream()
                 .map(name -> app.getApi().getAuthorsByLastName(name))
                 .filter(Wrapper.Result::isSuccess)
@@ -102,7 +121,6 @@ public class SearchByPatternActivity extends AppCompatActivity {
     }
 
     private List<Serie> loadMatchedSeries(List<String> names) {
-        AppContext app = (AppContext) getApplicationContext();
         return names.stream()
                 .map(name -> app.getApi().getSeriesBySerieName(name))
                 .filter(Wrapper.Result::isSuccess)
@@ -111,13 +129,25 @@ public class SearchByPatternActivity extends AppCompatActivity {
                 .collect(Collectors.toList());
     }
 
-    private ArrayAdapter<?> getAdapter(Context context, List<String> items) {
-        if (target.equals("authors")) {
-            return new AuthorAdapter(context, loadMatchedAuthors(items));
-        } else if (target.equals("series")) {
-            return new SerieAdapter(context, loadMatchedSeries(items));
-        } else {
-            return new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
+    private List<Book> loadMatchedBooks(List<String> names) {
+        return names.stream()
+                .map(name -> app.getApi().getBooksByBookTitle(name))
+                .filter(Wrapper.Result::isSuccess)
+                .map(Wrapper.Result::getValue)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+    }
+
+    private ArrayAdapter<?> getAdapter(List<String> items) {
+        switch (target) {
+            case "authors":
+                return new AuthorAdapter(this, loadMatchedAuthors(items));
+            case "series":
+                return new SerieAdapter(this, loadMatchedSeries(items));
+            case "books":
+                return new BookAdapter(this, loadMatchedBooks(items));
+            default:
+                return new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
         }
     }
 
@@ -127,7 +157,7 @@ public class SearchByPatternActivity extends AppCompatActivity {
                 .collect(Collectors.toList());
 
         if (!items.isEmpty()) {
-            ArrayAdapter<?> adapter = getAdapter(this, items);
+            ArrayAdapter<?> adapter = getAdapter(items);
             listView.setAdapter(adapter);
             listView.setVisibility(View.VISIBLE);
             listView.setOnItemClickListener((parent, view, position, id) -> {
@@ -151,6 +181,12 @@ public class SearchByPatternActivity extends AppCompatActivity {
                     intent.putExtra("mid", serie.author.middle_name.id);
                     intent.putExtra("lid", serie.author.last_name.id);
                     intent.putExtra("sid", serie.id);
+                    startActivity(intent);
+                }
+                if (item instanceof Book) {
+                    Book book = (Book) item;
+                    Intent intent = new Intent(this, BookActivity.class);
+                    intent.putExtra("id", book.id);
                     startActivity(intent);
                 }
             });

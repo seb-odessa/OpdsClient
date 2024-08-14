@@ -192,4 +192,12 @@ public class OpdsApiInstrumentedTest {
         assertEquals(List.of("Аврора [Кауфман]"), result.getValue().first);
         assertEquals(List.of(), result.getValue().second);
     }
+
+    @Test
+    public void getBooksByPrefix() {
+        Wrapper.Result<Pair<List<String>>> result = api.getSeriesByPrefix("Ави");
+        assertTrue(result.isSuccess());
+        assertEquals(List.of("Авиатрисы"), result.getValue().first);
+        assertEquals(List.of(), result.getValue().second);
+    }
 }

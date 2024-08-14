@@ -21,29 +21,26 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.opds.api.jni.Wrapper;
 import org.opds.api.models.Author;
 import org.opds.api.models.Book;
+import org.opds.api.models.Serie;
 import org.opds.client.adapters.AuthorAdapter;
 import org.opds.client.adapters.BookAdapter;
 import org.opds.utils.BooksHistory;
+import org.opds.utils.ErrorReporter;
 import org.opds.utils.Navigation;
 
 import java.io.File;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Locale;
 
 public class BookActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_MANAGE_EXTERNAL_STORAGE = 1;
     private static final String AUTHORITY = "org.opds.client.provider";
     private static final String TAG = "org.opds.client.BookActivity";
 
+    private ErrorReporter errorReporter = null;
     private AppContext app = null;
     Book book = null;
 
@@ -53,24 +50,17 @@ public class BookActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book);
         Navigation.create(this);
-        TextView selected = findViewById(R.id.selectedItemTextView);
 
         app = (AppContext) getApplicationContext();
+        errorReporter = new ErrorReporter(this, TAG);
         final int bid = getIntent().getIntExtra("id", 0);
         Wrapper.Result<Book> result = app.getApi().getBookById(bid);
         if (result.isSuccess()) {
             book = result.getValue();
-            TextView bookFile = findViewById(R.id.book_id);
-            bookFile.setText(String.format("Id: %d", book.id));
-            TextView bookTitle = findViewById(R.id.book_title);
-            bookTitle.setText(book.getTitle());
-            selected.setText(book.getTitle());
+            TextView selected = findViewById(R.id.selectedItemTextView);
+            selected.setText(book.name);
 
-            TextView bookSize = findViewById(R.id.book_size);
-            bookSize.setText(String.format("File size: %s", Book.format(book.size)));
-            TextView bookAdded = findViewById(R.id.book_added);
-            bookAdded.setText(String.format("Added to the library: %s", book.added));
-
+            loadMeta(book);
             loadAuthors(app.getApi().getAuthorsByBooksIds(new int[]{book.id}));
             loadBooks(app.getApi().getBooksBySerieId(book.sid));
 
@@ -87,7 +77,7 @@ public class BookActivity extends AppCompatActivity {
                 }
             });
         } else {
-            selected.setText(result.getError());
+            errorReporter.report("onCreate()", result.getError());
         }
     }
 
@@ -112,7 +102,7 @@ public class BookActivity extends AppCompatActivity {
                 if (Environment.isExternalStorageManager()) {
                     extractBookFromArchive();
                 } else {
-                    Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+                    errorReporter.report("onActivityResult()", "Permission denied");
                 }
             } else {
                 extractBookFromArchive();
@@ -128,7 +118,6 @@ public class BookActivity extends AppCompatActivity {
         Log.d(TAG, "Book File: " + bookFile);
         Log.d(TAG, "Library Path: " + libraryPath);
 
-        TextView selected = findViewById(R.id.selectedItemTextView); 
         Wrapper.Result<List<String>> result = Wrapper.findArchives(libraryPath, book.id);
         if (result.isSuccess()) {
             List<String> archives = result.getValue();
@@ -151,12 +140,12 @@ public class BookActivity extends AppCompatActivity {
                         SharedPreferences pref = getSharedPreferences(BooksHistory.TAG, Context.MODE_PRIVATE);
                         BooksHistory.add(pref, book);
                     } else {
-                        selected.setText(maybeOk.getError());
+                        errorReporter.report("extractBookFromArchive()", result.getError());
                     }
                 }
             }
         } else {
-            selected.setText(result.getError());
+            errorReporter.report("extractBookFromArchive()", result.getError());
         }
     }
 
@@ -170,8 +159,7 @@ public class BookActivity extends AppCompatActivity {
         try {
             startActivity(intent);
         } catch (Exception e) {
-            Log.e(TAG, "No application found to open the file.", e);
-            Toast.makeText(this, "No application found to open the file.", Toast.LENGTH_SHORT).show();
+            errorReporter.report("openFileWithOtherApp()", "No application found to open the file.");
         }
     }
 
@@ -192,13 +180,11 @@ public class BookActivity extends AppCompatActivity {
                 startActivity(intent);
             });
         } else {
-            TextView selectedItem = findViewById(R.id.selectedItemTextView);
-            selectedItem.setText(result.getError());
+            errorReporter.report("loadAuthors()", result.getError());
         }
     }
 
     public void loadBooks(Wrapper.Result<List<Book>> result) {
-        TextView selectedItem = findViewById(R.id.selectedItemTextView);
         if (result.isSuccess()) {
             List<Book> items = result.getValue();
             BookAdapter adapter = new BookAdapter(this, items);
@@ -212,7 +198,38 @@ public class BookActivity extends AppCompatActivity {
                 startActivity(intent);
             });
         } else {
-            selectedItem.setText(result.getError());
+            errorReporter.report("loadBooks()", result.getError());
         }
     }
+
+    private void loadSerie(int sid) {
+        if (sid != 0) {
+            Wrapper.Result<List<Serie>> result = app.getApi().getSeriesByIds(new int[]{sid});
+            if (result.isSuccess()) {
+                for(final Serie serie: result.getValue()) {
+                    TextView bookSerie = findViewById(R.id.book_serie);
+                    bookSerie.setText(String.format(Locale.US, "%s (%d)", serie.name, serie.count));
+                }
+            } else {
+                errorReporter.report("loadSerie()", result.getError());
+            }
+        }
+    }
+
+    private void loadMeta(Book book) {
+        TextView bookFile = findViewById(R.id.book_id);
+        bookFile.setText(String.format(Locale.US, "Id: %d", book.id));
+
+        TextView bookTitle = findViewById(R.id.book_title);
+        bookTitle.setText(book.getTitle());
+
+        TextView bookSize = findViewById(R.id.book_size);
+        bookSize.setText(String.format("File size: %s", Book.format(book.size)));
+
+        TextView bookAdded = findViewById(R.id.book_added);
+        bookAdded.setText(String.format("Added to the library: %s", book.added));
+
+        loadSerie(book.sid);
+    }
+
 }

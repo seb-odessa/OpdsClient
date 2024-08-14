@@ -44,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
         Button searchSeries = findViewById(R.id.search_series);
         searchSeries.setOnClickListener(v -> openSearchByPatternActivity("series"));
 
+        Button searchBooks = findViewById(R.id.search_titles);
+        searchBooks.setOnClickListener(v -> openSearchByPatternActivity("books"));
+
         Button searchGenres = findViewById(R.id.search_by_genres);
         searchGenres.setOnClickListener(v -> openSearchByGenreActivity());
 

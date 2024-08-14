@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-07-28T12:23:16.687118506Z">
+        <DropdownSelection timestamp="2024-07-31T14:02:09.014229481Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=ZE222VB4G7" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/seb/.android/avd/API-30-x86.avd" />
             </handle>
           </Target>
         </DropdownSelection>
@@ -39,6 +39,9 @@
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="getMetaGenres()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="getBooksByPrefix()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
