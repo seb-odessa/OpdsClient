@@ -61,7 +61,7 @@ public class GenreActivity extends AppCompatActivity {
 
         YearMonth currentMonth = YearMonth.now();
         LinearLayout linearLayout = findViewById(R.id.genre_buttons);
-        for (int i = 0; i < 12; i++) {
+        for (int i = 1; i <= 12; i++) {
             YearMonth month = currentMonth.minusMonths(i);
             Button button = new Button(this);
             button.setText(month.format(textFmt));
