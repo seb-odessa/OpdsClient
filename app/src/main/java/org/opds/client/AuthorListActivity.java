@@ -54,6 +54,7 @@ public class AuthorListActivity extends AppCompatActivity {
                 List<Author> authors = BooksHistory.load(pref)
                         .stream()
                         .map(book -> book.author)
+                        .distinct()
                         .collect(Collectors.toList());
                 loadItems(authors);
                 break;

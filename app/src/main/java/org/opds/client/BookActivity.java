@@ -136,9 +136,9 @@ public class BookActivity extends AppCompatActivity {
                     if (maybeOk.isSuccess()) {
                         File path = new File(destination + "/" +  bookFile);
                         Log.d(TAG, "File destination: " + path.getAbsolutePath());
-                        openFileWithOtherApp(path);
                         SharedPreferences pref = getSharedPreferences(BooksHistory.TAG, Context.MODE_PRIVATE);
                         BooksHistory.add(pref, book);
+                        openFileWithOtherApp(path);
                     } else {
                         errorReporter.report("extractBookFromArchive()", result.getError());
                     }
