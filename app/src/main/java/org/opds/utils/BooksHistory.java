@@ -24,14 +24,18 @@ public class BooksHistory {
     public static void add(SharedPreferences pref, Book book) {
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+        if (BooksHistory.load(pref).contains(book)) {
+            Log.d(TAG, "add(): already exists => " + book.toString());
+            return;
+        }
+
         Set<String> sortedKeys = new TreeSet<>(Comparator.reverseOrder());
         sortedKeys.addAll(pref.getStringSet(KEYS, new TreeSet<>()));
 
         SharedPreferences.Editor editor = pref.edit();
         try {
-            String jsonString = book.serialize();
             final String key = LocalDateTime.now().format(formatter);
-            editor.putString(key, jsonString);
+            editor.putString(key, book.serialize());
             sortedKeys.add(key);
             Log.d(TAG, "add(): <- " + key + " => " + book.toString());
         } catch (JsonProcessingException e) {
@@ -44,10 +48,10 @@ public class BooksHistory {
         for (final String key : sortedKeys) {
             if (count <= MAX_COUNT) {
                 latest.add(key);
+                count++;
             } else {
                 editor.remove(key);
             }
-            count++;
         }
         editor.putStringSet(KEYS, latest);
         editor.apply();
@@ -55,7 +59,7 @@ public class BooksHistory {
 
     public static List<Book> load(SharedPreferences pref) {
         List<Book> books = new ArrayList<>();
-        TreeSet<String> sortedKeys = new TreeSet<>(Comparator.reverseOrder());
+        Set<String> sortedKeys = new TreeSet<>(Comparator.reverseOrder());
         sortedKeys.addAll(pref.getStringSet(KEYS, new TreeSet<>()));
         Log.e(TAG, "load(): -> sortedKeys: " + sortedKeys.toString());
 
